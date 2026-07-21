@@ -3,12 +3,12 @@ import {
   ShieldAlert, ShieldCheck, AlertTriangle, Terminal, Cpu, Key, AlertOctagon, 
   RefreshCw, Radar, Globe, Target, Eye, EyeOff, Radio, Search, Skull, 
   Flame, Zap, Play, CheckCircle2, ChevronRight, Bug, Server, ShieldCheck as ShieldCheckIcon,
-  Activity, Heart, ClipboardList, Check
+  Activity, Heart, ClipboardList, Check, Sparkles, Brain, Plus, Compass
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { diagnoseSystem, DiagnosisResult } from '../services/geminiService';
+import { diagnoseSystem, DiagnosisResult, defaultThreats } from '../services/geminiService';
 
-interface SentryWolfProps {
+interface AmanovaWolfProps {
   language: string;
   theme: 'light' | 'dark';
 }
@@ -61,14 +61,14 @@ const ATTACK_EVENTS = [
   "Reverse shell socket payload request"
 ];
 
-export function SentryWolfView({ language, theme }: SentryWolfProps) {
-  const isRTL = language === 'Arabic';
-  const [activeTab, setActiveTab] = useState<'hunt' | 'decoy' | 'sandbox' | 'doctor'>('hunt');
+  export function AmanovaWolfView({ language, theme }: AmanovaWolfProps) {
+    const isRTL = language === 'Arabic';
+    const [activeTab, setActiveTab] = useState<'hunt' | 'decoy' | 'sandbox' | 'doctor' | 'wolf_upgrade'>('hunt');
 
   // Multi-language dictionary
   const dict: Record<string, Record<string, string>> = {
     title: {
-      English: 'Sentry Wolf // Active Cyber Hunter',
+      English: 'AMANOVA Wolf // Active Cyber Hunter',
       Arabic: 'محطة الذئب السيبراني // الصيد والدفاع النشط'
     },
     subtitle: {
@@ -108,7 +108,7 @@ export function SentryWolfView({ language, theme }: SentryWolfProps) {
       Arabic: 'جاري مسح قواعد الويب المظلم...'
     },
     doctorTitle: {
-      English: 'SentryAI System Doctor // Neural Clinic',
+      English: 'AMANOVA System Doctor // Neural Clinic',
       Arabic: 'طبيب النظام الذكي // العيادة العصبية السيبرانية'
     },
     doctorSubtitle: {
@@ -126,6 +126,30 @@ export function SentryWolfView({ language, theme }: SentryWolfProps) {
     doctorPlaceholder: {
       English: 'Write or paste a system report, port configuration, or active task parameters to analyze...',
       Arabic: 'اكتب أو الصق تقرير النظام، إعدادات المنافذ، أو معاملات المهام النشطة لتشخيصها...'
+    },
+    tabUpgrade: {
+      English: 'Wolf Neural Upgrade',
+      Arabic: 'ترقية نظام الذئب الذكي'
+    },
+    upgradeTitle: {
+      English: 'Wolf Neural Learning Core // Continuous Brain',
+      Arabic: 'نواة التعلم الذاتي للذئب // ترقية الفحص الذكي'
+    },
+    upgradeSubtitle: {
+      English: 'Feed raw scam text, phishing SMS, or support prompts to Wolf. Dissect tactics, compare to past campaigns, and auto-ingest new defensive rules.',
+      Arabic: 'غذِّ نظام الذئب بنصوص الاحتيال، رسائل التصيد، أو مكالمات الدعم. حلل التكتيكات، قارن بالحملات السابقة، وحدث قواعد جدار الحماية تلقائياً.'
+    },
+    feedToCore: {
+      English: 'Feed into Neural Core',
+      Arabic: 'تغذية النواة الذكية بالتهديد'
+    },
+    learningText: {
+      English: 'Wolf is learning scam tactics...',
+      Arabic: 'جاري تلقين النواة بتكتيك الاحتيال...'
+    },
+    scamFeedPlaceholder: {
+      English: 'Paste a suspicious SMS, phishing email body, support scam transcript, or investment prompt to learn...',
+      Arabic: 'أدخل أو الصق رسالة تصيد مشبوهة، محتوى بريد احتيالي، أو نص مكالمة دعم منتحلة لتلقين النواة...'
     }
   };
 
@@ -140,6 +164,121 @@ export function SentryWolfView({ language, theme }: SentryWolfProps) {
   const [isDiagnosing, setIsDiagnosing] = useState(false);
   const [diagnosisResult, setDiagnosisResult] = useState<DiagnosisResult | null>(null);
 
+  // --- WOLF NEURAL UPGRADE STATE ---
+  const [scamFeed, setScamFeed] = useState('');
+  const [selectedScamPreset, setSelectedScamPreset] = useState('scam1');
+  const [isUpgrading, setIsUpgrading] = useState(false);
+  const [upgradeResult, setUpgradeResult] = useState<any | null>(null);
+  const [ingestionSuccess, setIngestionSuccess] = useState(false);
+  const [previousCampaigns, setPreviousCampaigns] = useState<any[]>([]);
+
+  useEffect(() => {
+    try {
+      const savedCampaigns = localStorage.getItem('sentry_threat_campaigns');
+      if (savedCampaigns) {
+        setPreviousCampaigns(JSON.parse(savedCampaigns));
+      } else {
+        setPreviousCampaigns([
+          { id: "camp-cobalt-shadow", name: "Operation Cobalt Shadow", description: "APT campaign targeting secure financial protocols." },
+          { id: "camp-vanguard", name: "Vanguard Crypto Ransomware", description: "Ransomware targeting cloud databases." },
+          { id: "camp-volt-typhoon", name: "Volt Typhoon Scams", description: "Credential harvesting and SMS/email spoofing." }
+        ]);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, [activeTab]);
+
+  const scamPresets: Record<string, { label: string; text: string }> = {
+    scam1: {
+      label: language === 'Arabic' ? 'تصيد اشتراك نتفليكس (هندسة اجتماعية)' : 'Netflix Suspend Phish SMS (BEC)',
+      text: `NETFLIX ALERT: Your subscription has been suspended due to an unverified payment method. Resolve immediately to maintain streaming access at: https://netflix-assist-verify.xyz/login?session=9218`
+    },
+    scam2: {
+      label: language === 'Arabic' ? 'توزيع عملات مشفرة مجاني (سرقة محفظة)' : 'Crypto Airdrop Giveaway (Wallet Drain)',
+      text: `CONGRATULATIONS! You have been selected for the $5,000 Ethereum Foundation dynamic airdrop. Connect your Metamask or trust wallet to approve the allocation and claim your funds at: https://ethereum-rewards-pool.live/claim`
+    },
+    scam3: {
+      label: language === 'Arabic' ? 'دعم مايكروسوفت المزيف (احتيال هاتفي)' : 'Fake Microsoft Support (Phone Coercion)',
+      text: `SECURITY ALERT: Your PC is infected with Zeus Malware. Your credit card details and passwords are being leaked. Do not restart your computer. Call Microsoft Certified Technicians immediately at +1-888-512-0943 to resolve this threat.`
+    }
+  };
+
+  const handleUpgradeAnalysis = async () => {
+    if (!scamFeed.trim()) return;
+    setIsUpgrading(true);
+    setUpgradeResult(null);
+    setIngestionSuccess(false);
+
+    try {
+      const response = await fetch('/api/v1/wolf/upgrade-analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          scamText: scamFeed,
+          previousCampaigns: previousCampaigns,
+          language: language === 'Arabic' ? 'Arabic' : 'English'
+        })
+      });
+
+      const data = await response.json();
+      if (data.success && data.analysis) {
+        setUpgradeResult(data.analysis);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsUpgrading(false);
+    }
+  };
+
+  const handleApproveIngestion = () => {
+    if (!upgradeResult) return;
+    try {
+      let records = [];
+      const saved = localStorage.getItem('sentry_threat_records');
+      if (saved) {
+        records = JSON.parse(saved);
+      } else {
+        records = [...defaultThreats];
+      }
+
+      const newRecord = {
+        id: `threat-learned-${Date.now()}`,
+        name: upgradeResult.scamName,
+        threatType: upgradeResult.classification,
+        severity: upgradeResult.severity,
+        riskScore: upgradeResult.riskScore,
+        confidence: upgradeResult.confidence,
+        firstSeen: new Date().toISOString(),
+        lastSeen: new Date().toISOString(),
+        aiSummary: upgradeResult.aiSummary,
+        recommendedActions: upgradeResult.suggestedActions,
+        campaignId: upgradeResult.campaignComparison.matchedCampaignId || null,
+        indicators: upgradeResult.indicators.map((ind: any, i: number) => ({
+          id: `ind-learned-${Date.now()}-${i}`,
+          type: ind.type,
+          originalValue: ind.value,
+          value: ind.value,
+          description: ind.description,
+          addedAt: new Date().toISOString().split('T')[0]
+        })),
+        addedAt: new Date().toISOString().split('T')[0]
+      };
+
+      records.unshift(newRecord);
+      localStorage.setItem('sentry_threat_records', JSON.stringify(records));
+
+      setIngestionSuccess(true);
+      window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new Event('sentry-threats-updated'));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const doctorPresets = {
     preset1: {
       label: language === 'Arabic' ? 'عدوى ملفات الارتباط الكوكيز (حرجة)' : 'Compromised Browser Cookies (Critical)',
@@ -150,7 +289,7 @@ export function SentryWolfView({ language, theme }: SentryWolfProps) {
     preset2: {
       label: language === 'Arabic' ? 'نظام مشفر ومحمي بالكامل (سليم)' : 'Fully Encrypted Safe Host (Pristine)',
       text: language === 'Arabic'
-        ? `[تقرير تشخيص النظام]\nالبيئة: Sentry Sandbox معزول بالكامل\nالتحقق متعدد العوامل: مفعل ومقيد برموز أمان صلبة FIDO2\nبروتوكولات التشفير: TLS 1.3 معزز بـ AES-256-GCM\nالحالة: جميع مؤشرات النبض سليمة، لا توجد إضافات متصفح مجهولة، حماية الذاكرة مفعلة.\nمستكشف التهديدات: نظيف بالكامل.`
+        ? `[تقرير تشخيص النظام]\nالبيئة: AMANOVA Sandbox معزول بالكامل\nالتحقق متعدد العوامل: مفعل ومقيد برموز أمان صلبة FIDO2\nبروتوكولات التشفير: TLS 1.3 معزز بـ AES-256-GCM\nالحالة: جميع مؤشرات النبض سليمة، لا توجد إضافات متصفح مجهولة، حماية الذاكرة مفعلة.\nمستكشف التهديدات: نظيف بالكامل.`
         : `[SYSTEM DIAGNOSTIC REPORT]\nPlatform: Chrome OS Isolated Sandbox\nAuthentication: MFA Enabled via hardware security keys (FIDO2)\nEncryption: End-to-end TLS 1.3 with AES-256-GCM enforced\nLocalStorage: fully cleared and zeroized on session termination\nStatus: Normal heartbeat telemetry. Vulnerability scan returned 0 triggers.`
     },
     preset3: {
@@ -449,6 +588,16 @@ export function SentryWolfView({ language, theme }: SentryWolfProps) {
             }`}
           >
             {getTxt('tabDoctor')}
+          </button>
+          <button
+            onClick={() => setActiveTab('wolf_upgrade')}
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+              activeTab === 'wolf_upgrade' 
+                ? 'bg-red-500 text-white shadow-lg font-black' 
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            {getTxt('tabUpgrade')}
           </button>
         </div>
       </div>
@@ -844,7 +993,7 @@ export function SentryWolfView({ language, theme }: SentryWolfProps) {
                       <div>
                         <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest block">SYSTEM PULSE</span>
                         <span className="text-xs font-bold text-emerald-400">
-                          {isRTL ? "النبض الأمني نشط وبصحة مستقرة" : "Sentry Pulse Active & Syncing"}
+                          {isRTL ? "النبض الأمني نشط وبصحة مستقرة" : "AMANOVA Pulse Active & Syncing"}
                         </span>
                       </div>
                     </div>
@@ -1061,7 +1210,7 @@ export function SentryWolfView({ language, theme }: SentryWolfProps) {
                           <div className={isRTL ? 'text-left' : 'text-right'}>
                             <span className="text-white/30 block uppercase">{isRTL ? "توقيع طبيب الحراسة" : "Security Surgeon MD"}</span>
                             <span className="text-white/80 font-bold italic">
-                              {isRTL ? "د. ذئب الحراسة المعتمد" : "Dr. Sentry Wolf, AI Security MD"}
+                              {isRTL ? "د. ذئب الحراسة المعتمد" : "Dr. AMANOVA Wolf, AI Security MD"}
                             </span>
                           </div>
                         </div>
@@ -1079,6 +1228,287 @@ export function SentryWolfView({ language, theme }: SentryWolfProps) {
                         {isRTL 
                           ? "قم بتحميل أحد تقارير الحالات أو ادخل بيانات التهيئة المخصصة، ثم اضغط على زر الفحص للبدء"
                           : "Load a diagnostic case record from presets or write your own, then trigger the clinical scan."}
+                      </p>
+                    </div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* TAB 5: WOLF NEURAL CORE UPGRADE */}
+        {activeTab === 'wolf_upgrade' && (
+          <motion.div
+            key="wolf_upgrade"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            className="space-y-6"
+          >
+            {/* Header info card */}
+            <div className={`p-6 rounded-2xl border ${theme === 'dark' ? 'bg-[#0E1012] border-white/5' : 'bg-slate-50 border-slate-200'} flex flex-col md:flex-row items-start gap-4 ${isRTL ? 'md:flex-row-reverse text-right' : ''}`}>
+              <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/20 text-red-500">
+                <Brain className="w-8 h-8 animate-pulse" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-lg font-black text-white uppercase tracking-tight">
+                  {getTxt('upgradeTitle')}
+                </h3>
+                <p className="text-xs text-white/50 leading-relaxed max-w-4xl">
+                  {getTxt('upgradeSubtitle')}
+                </p>
+              </div>
+            </div>
+
+            {/* Main Interactive Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* Left Column: Input Scam Feed & Presets */}
+              <div className="lg:col-span-5 space-y-6">
+                <div className={`p-6 rounded-2xl border ${theme === 'dark' ? 'bg-[#0E1012] border-white/5' : 'bg-white border-slate-200'} space-y-4`}>
+                  <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <span className="text-xs font-mono text-red-400 uppercase tracking-widest block font-bold">
+                      {isRTL ? "تغذية النواة وتحميل العينات" : "INPUT SCAM INGESTION"}
+                    </span>
+                    <span className="text-[10px] bg-red-500/10 border border-red-500/20 text-red-400 px-2 py-0.5 rounded font-mono font-bold">
+                      {isRTL ? "تعلم نشط" : "ACTIVE NLP"}
+                    </span>
+                  </div>
+
+                  {/* Preset Selector */}
+                  <div className="space-y-2">
+                    <label className={`text-[10px] font-mono text-white/40 uppercase tracking-wider block ${isRTL ? 'text-right' : ''}`}>
+                      {isRTL ? "اختر عينة تصيد جاهزة للاختبار:" : "LOAD HIGH-FIDELITY SAMPLE CASE:"}
+                    </label>
+                    <div className="grid grid-cols-1 gap-2">
+                      {Object.entries(scamPresets).map(([key, preset]) => (
+                        <button
+                          key={key}
+                          onClick={() => {
+                            setSelectedScamPreset(key);
+                            setScamFeed(preset.text);
+                            setUpgradeResult(null);
+                            setIngestionSuccess(false);
+                          }}
+                          className={`px-3 py-2 text-xs rounded-lg text-left transition-all border flex items-center justify-between ${
+                            selectedScamPreset === key 
+                              ? 'bg-red-500/10 border-red-500/30 text-white font-semibold' 
+                              : 'bg-white/5 border-white/5 text-white/60 hover:text-white hover:bg-white/[0.08]'
+                          } ${isRTL ? 'flex-row-reverse text-right' : ''}`}
+                        >
+                          <span className="truncate">{preset.label}</span>
+                          <Sparkles className="w-3.5 h-3.5 text-red-400 opacity-80 flex-shrink-0" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Raw Scam Textarea */}
+                  <div className="space-y-2">
+                    <label className={`text-[10px] font-mono text-white/40 uppercase tracking-wider block ${isRTL ? 'text-right' : ''}`}>
+                      {isRTL ? "محتوى رسالة الاحتيال أو الاتصال المشبوه:" : "RAW SCAM TEXT / COMMUNICATIVE PAYLOAD:"}
+                    </label>
+                    <textarea
+                      value={scamFeed}
+                      onChange={(e) => {
+                        setScamFeed(e.target.value);
+                        setSelectedScamPreset('');
+                      }}
+                      placeholder={getTxt('scamFeedPlaceholder')}
+                      rows={6}
+                      className={`w-full p-4 rounded-xl border font-mono text-xs focus:outline-none focus:ring-1 focus:ring-red-500 transition-all ${
+                        theme === 'dark' 
+                          ? 'bg-[#08090A] border-white/5 text-white placeholder-white/20' 
+                          : 'bg-slate-50 border-slate-200 text-slate-800'
+                      } ${isRTL ? 'text-right placeholder-right' : ''}`}
+                    />
+                  </div>
+
+                  {/* Train/Analyze Action Button */}
+                  <button
+                    onClick={handleUpgradeAnalysis}
+                    disabled={isUpgrading || !scamFeed.trim()}
+                    className={`w-full py-3 px-4 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 ${
+                      isUpgrading || !scamFeed.trim()
+                        ? 'bg-white/5 border border-white/5 text-white/30 cursor-not-allowed'
+                        : 'bg-red-500 hover:bg-red-600 text-white shadow-lg active:scale-[0.98]'
+                    } ${isRTL ? 'flex-row-reverse' : ''}`}
+                  >
+                    {isUpgrading ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>{getTxt('learningText')}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Brain className="w-4 h-4" />
+                        <span>{getTxt('feedToCore')}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Column: AI Analysis Result & Continuous Ingestion Block */}
+              <div className="lg:col-span-7">
+                <AnimatePresence mode="wait">
+                  {upgradeResult ? (
+                    <motion.div
+                      key="upgrade-result"
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className={`p-6 rounded-2xl border space-y-6 relative overflow-hidden ${
+                        theme === 'dark' ? 'bg-[#0E1012] border-red-500/20' : 'bg-slate-50 border-slate-200'
+                      }`}
+                    >
+                      {/* Interactive top banner */}
+                      <div className={`flex flex-col md:flex-row justify-between gap-4 border-b border-white/5 pb-5 ${isRTL ? 'md:flex-row-reverse text-right' : ''}`}>
+                        <div>
+                          <span className="text-[9px] font-mono text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded uppercase tracking-wider mb-2 inline-block">
+                            {isRTL ? "استخلاص ذكاء التهديدات" : "COGNITIVE DISSECTION EXTRACT"}
+                          </span>
+                          <h3 className="text-xl font-black text-white leading-tight">
+                            {upgradeResult.scamName}
+                          </h3>
+                        </div>
+
+                        {/* Severity Metric */}
+                        <div className={`flex items-center gap-3 bg-white/5 border border-white/5 px-3 py-2 rounded-xl self-start ${isRTL ? 'flex-row-reverse' : ''}`}>
+                          <div className={isRTL ? 'text-right' : 'text-left'}>
+                            <span className="text-[8px] font-mono text-white/40 uppercase block">{isRTL ? "مستوى الخطورة" : "Severity Gauge"}</span>
+                            <span className={`text-xs font-black uppercase ${
+                              upgradeResult.severity === 'Critical' || upgradeResult.severity === 'High' ? 'text-red-500' : 'text-amber-400'
+                            }`}>{upgradeResult.severity}</span>
+                          </div>
+                          <div className="w-8 h-8 rounded-full border-2 border-red-500/20 flex items-center justify-center font-mono text-xs font-black text-red-400">
+                            {upgradeResult.riskScore}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Detail 1: AI Summary & Tactics */}
+                      <div className={`space-y-2 ${isRTL ? 'text-right' : ''}`}>
+                        <span className="text-[10px] font-mono text-red-400 uppercase tracking-widest block font-bold">
+                          {isRTL ? "الملخص التحليلي للذئب" : "WOLF AI ANALYSIS SUMMARY"}
+                        </span>
+                        <p className="text-xs text-white/80 leading-relaxed font-semibold">
+                          {upgradeResult.aiSummary}
+                        </p>
+                      </div>
+
+                      {/* Detail 2: Campaign Similarity & Correlation */}
+                      <div className={`p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-3 ${isRTL ? 'text-right' : ''}`}>
+                        <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                          <div className="flex items-center gap-2 text-xs font-bold text-white">
+                            <Compass className="w-4 h-4 text-red-400 animate-spin-slow" />
+                            <span>{isRTL ? "مقارنة بالحملات السابقة" : "Campaign Similarity & Linkage"}</span>
+                          </div>
+                          {upgradeResult.campaignComparison.similarityScore > 0 && (
+                            <span className="text-[10px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-mono font-bold">
+                              {upgradeResult.campaignComparison.similarityScore}% {isRTL ? "تطابق تكتيكي" : "Overlap"}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className={`text-xs font-mono ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
+                          <span className="text-white/40">{isRTL ? "الحملة المرتبطة: " : "Correlated Campaign: "}</span>
+                          <span className="text-red-400 font-bold">{upgradeResult.campaignComparison.matchedCampaignName}</span>
+                        </div>
+
+                        <p className="text-xs text-white/60 leading-relaxed">
+                          {upgradeResult.campaignComparison.comparisonAnalysis}
+                        </p>
+                      </div>
+
+                      {/* Detail 3: Discovered Indicators (IOCs) */}
+                      <div className={`space-y-2 ${isRTL ? 'text-right' : ''}`}>
+                        <span className="text-[10px] font-mono text-red-400 uppercase tracking-widest block font-bold">
+                          {isRTL ? "المؤشرات المستخلصة للشبكة" : "DISCOVERED INDICATORS OF COMPROMISE (IOCs)"}
+                        </span>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {upgradeResult.indicators.map((ind: any, idx: number) => (
+                            <div key={idx} className={`p-2.5 rounded-lg bg-[#08090A] border border-white/5 flex items-center gap-2.5 text-xs text-white/80 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                              <span className="text-[8px] font-mono bg-red-500/10 border border-red-500/20 text-red-400 px-1.5 py-0.5 rounded uppercase font-bold">
+                                {ind.type}
+                              </span>
+                              <span className="font-mono text-[11px] truncate flex-1">{ind.value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Detail 4: Reasoning & Explanation */}
+                      <div className={`space-y-1.5 ${isRTL ? 'text-right' : ''}`}>
+                        <span className="text-[10px] font-mono text-red-400 uppercase tracking-widest block font-bold">
+                          {isRTL ? "مسببات الفحص وتفكيك المنطق" : "COGNITIVE REASONING EXPLANATION"}
+                        </span>
+                        <p className="text-xs text-white/60 leading-relaxed">
+                          {upgradeResult.reasoningExplanation}
+                        </p>
+                      </div>
+
+                      {/* Detail 5: Suggested Actions */}
+                      <div className={`space-y-2 ${isRTL ? 'text-right' : ''}`}>
+                        <span className="text-[10px] font-mono text-red-400 uppercase tracking-widest block font-bold">
+                          {isRTL ? "الإجراءات الموصى بها لوقف الخطر" : "SUGGESTED MITIGATION COMMANDS"}
+                        </span>
+                        <div className="space-y-1.5">
+                          {upgradeResult.suggestedActions.map((action: string, idx: number) => (
+                            <div key={idx} className={`flex items-start gap-2 text-xs text-white/70 ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
+                              <CheckCircle2 className="w-4 h-4 mt-0.5 text-red-500 flex-shrink-0" />
+                              <span>{action}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Detail 6: Continuous Improvement Notes */}
+                      <div className={`p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10 space-y-1 ${isRTL ? 'text-right' : ''}`}>
+                        <span className="text-[9px] font-mono text-emerald-400 uppercase tracking-wider block font-bold">
+                          {isRTL ? "تطوير الكفاءة والتحسين المستمر" : "CONTINUOUS IMPROVEMENT LOOPS"}
+                        </span>
+                        <p className="text-xs text-emerald-300/80 leading-relaxed">
+                          {upgradeResult.continuousImprovementNotes}
+                        </p>
+                      </div>
+
+                      {/* Continuous Improvement Ingest Call-To-Action! */}
+                      <div className="pt-4 border-t border-white/5 space-y-4">
+                        {ingestionSuccess ? (
+                          <div className={`p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-3 ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
+                            <CheckCircle2 className="w-6 h-6 text-emerald-400 flex-shrink-0" />
+                            <div>
+                              <p className="text-sm font-black text-white">{isRTL ? "تم دمج مؤشرات التهديد بنجاح!" : "THREAT INTEGRATED SUCCESSFULLY!"}</p>
+                              <p className="text-xs text-emerald-300/80 mt-0.5">
+                                {isRTL 
+                                  ? "تم حقن القواعد الجديدة في محرك الفحص السريع والذكي. جدار الحماية مهيأ لفلترة أي تطابق مستقبلي تلقائياً."
+                                  : "Indicators of compromise have been successfully injected into AMANOVA's global threat matrix. The fast heuristic pre-scanner is now dynamically hardened against this scam profile."}
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={handleApproveIngestion}
+                            className={`w-full py-3 px-4 rounded-xl font-bold text-xs bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
+                          >
+                            <Plus className="w-4 h-4 animate-bounce" />
+                            <span>{isRTL ? "اعتماد وحقن نمط التهديد في محرك الحراسة" : "APPROVE & INGEST THREAT MATRIX"}</span>
+                          </button>
+                        )}
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <div className={`h-full flex flex-col items-center justify-center text-center p-16 border border-dashed rounded-2xl ${
+                      theme === 'dark' ? 'border-white/5 text-white/15 bg-white/[0.01]' : 'border-slate-200 text-slate-400 bg-slate-50'
+                    }`}>
+                      <Brain className="w-16 h-16 mb-4 text-red-500/30 animate-pulse" />
+                      <p className="text-sm font-bold text-white/40 uppercase tracking-widest">
+                        {isRTL ? "في انتظار تزويد النواة بالبيانات..." : "Awaiting Threat Ingestion Stream..."}
+                      </p>
+                      <p className="text-xs text-white/20 max-w-sm mt-2">
+                        {isRTL 
+                          ? "اختر عينة جاهزة أو الصق محتوى تواصل مشبوه على اليسار، ليتسنى للذئب تشريح التكتيكات واستخلاص المعايير الأمنية."
+                          : "Select a pre-configured sample or paste raw malicious text into the left pane to begin deep cognitive tactic dissection."}
                       </p>
                     </div>
                   )}

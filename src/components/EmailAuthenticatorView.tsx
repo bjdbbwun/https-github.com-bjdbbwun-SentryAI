@@ -161,6 +161,23 @@ export function EmailAuthenticatorView({ language, theme }: EmailAuthenticatorPr
   const handleParse = () => {
     if (!rawText.trim()) return;
 
+    const lowerText = rawText.toLowerCase();
+    const hasHeaders = ["from:", "subject:", "received-spf:", "dkim-signature:", "authentication-results:", "spf=", "dkim=", "dmarc="].some(m => lowerText.includes(m)) || lowerText.includes("received:") || lowerText.includes("message-id:");
+
+    if (!hasHeaders) {
+      setParsedResults({
+        name: 'Unavailable',
+        email: 'Unavailable',
+        subject: 'Unavailable',
+        spf: 'Unavailable',
+        dkim: 'Unavailable',
+        dmarc: 'Unavailable',
+        brandCheck: { isSpoofed: false, alerts: [] },
+        reason: 'Email headers were not provided. Authentication could not be verified.'
+      });
+      return;
+    }
+
     // Regex extraction
     const fromMatch = rawText.match(/From:\s*([^<\n]+)?(?:<([^>\n]+)>)?/i) || rawText.match(/from:\s*([^\s\n]+)/i);
     const subjectMatch = rawText.match(/Subject:\s*(.*)/i);
@@ -182,14 +199,14 @@ export function EmailAuthenticatorView({ language, theme }: EmailAuthenticatorPr
 
     const subject = subjectMatch ? subjectMatch[1].trim() : 'No Subject Found';
     
-    let spfVal: 'PASS' | 'FAIL' | 'NONE' = 'NONE';
+    let spfVal: 'PASS' | 'FAIL' | 'NONE' | 'Unavailable' = 'NONE';
     if (spfMatch) {
       const s = spfMatch[1].toUpperCase();
       if (s.includes('PASS')) spfVal = 'PASS';
       else if (s.includes('FAIL')) spfVal = 'FAIL';
     }
 
-    let dkimVal: 'PASS' | 'FAIL' | 'NONE' = 'NONE';
+    let dkimVal: 'PASS' | 'FAIL' | 'NONE' | 'Unavailable' = 'NONE';
     if (dkimMatch) {
       if (Array.isArray(dkimMatch)) {
         const d = dkimMatch[1]?.toUpperCase() || '';
@@ -201,7 +218,7 @@ export function EmailAuthenticatorView({ language, theme }: EmailAuthenticatorPr
       }
     }
 
-    let dmarcVal: 'PASS' | 'FAIL' | 'NONE' = 'NONE';
+    let dmarcVal: 'PASS' | 'FAIL' | 'NONE' | 'Unavailable' = 'NONE';
     if (dmarcMatch) {
       const dm = dmarcMatch[1].toUpperCase();
       if (dm.includes('PASS')) dmarcVal = 'PASS';
@@ -217,7 +234,8 @@ export function EmailAuthenticatorView({ language, theme }: EmailAuthenticatorPr
       spf: spfVal,
       dkim: dkimVal,
       dmarc: dmarcVal,
-      brandCheck
+      brandCheck,
+      reason: 'Analyzed raw email headers.'
     });
   };
 

@@ -2,9 +2,9 @@ export type AppLanguage = 'English' | 'Arabic' | 'Spanish' | 'French' | 'German'
 
 export const translations: Record<Exclude<AppLanguage, 'Auto'>, any> = {
   English: {
-    tagline: "Cybersecurity Intelligence Terminal // v1.1.0",
-    slogan: "Your Digital Shield in an Uncertain World",
-    engine: "Secure Text Analysis Engine",
+    tagline: "Simple digital protection for you and your family.",
+    slogan: "Check before you trust.",
+    engine: "AMANOVA Security Suite",
     scanner: "Scanner",
     logFile: "Log File",
     placeholder: "Paste suspicious text, email body, or message here for deep analysis...",
@@ -76,12 +76,15 @@ export const translations: Record<Exclude<AppLanguage, 'Auto'>, any> = {
     classificationPhishing: "Phishing",
     classificationScam: "Scam",
     classificationSocialEngineering: "Social Engineering",
+    classificationCryptoScam: "Crypto Scam",
+    classificationFakeSupport: "Fake Support",
+    classificationFakeInvestment: "Fake Investment",
     classificationSafe: "Safe"
   },
   Arabic: {
-    tagline: "محطة استخبارات الأمن السيبراني // الإصدار 1.1.0",
-    slogan: "درعك الرقمي في عالم غير آمن",
-    engine: "محرك تحليل النصوص الآمن",
+    tagline: "حماية رقمية بسيطة لك ولعائلتك.",
+    slogan: "تحقق قبل أن تثق.",
+    engine: "أمانوفا لحماية العائلة",
     scanner: "الماسح الضوئي",
     logFile: "سجل العمليات",
     placeholder: "أدخل النص المشبوه أو محتوى البريد الإلكتروني هنا للتحليل العميق...",
@@ -153,6 +156,9 @@ export const translations: Record<Exclude<AppLanguage, 'Auto'>, any> = {
     classificationPhishing: "تصيد احتيالي",
     classificationScam: "عملية احتيال",
     classificationSocialEngineering: "هندسة اجتماعية",
+    classificationCryptoScam: "احتيال العملات الرقمية",
+    classificationFakeSupport: "دعم فني زائف",
+    classificationFakeInvestment: "استثمار زائف",
     classificationSafe: "آمن"
   },
   Spanish: {

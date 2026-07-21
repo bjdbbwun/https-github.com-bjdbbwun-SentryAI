@@ -1,6 +1,6 @@
 {
-  "name": "SentryAI Family Shield",
-  "description": "An AI-powered cybersecurity scanner and family safety network protecting seniors from phishing, scams, and digital threats through a secure guardian-senior connection.",
+  "name": "AMANOVA",
+  "description": "Simple digital protection for you and your family. Scan suspicious links, review recent activity, and protect the people who matter to you.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

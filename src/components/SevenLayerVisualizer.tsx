@@ -14,6 +14,7 @@ interface SevenLayers {
   layer5: LayerReport;
   layer6: LayerReport;
   layer7: LayerReport;
+  layer8?: LayerReport;
 }
 
 interface SevenLayerVisualizerProps {
@@ -34,7 +35,8 @@ export function SevenLayerVisualizer({ sevenLayers, language, theme }: SevenLaye
     layer4: isRTL ? 'الطبقة 4: التحليل الدلالي (ذكاء اصطناعي)' : 'L4: AI Semantic NLP Intent',
     layer5: isRTL ? 'الطبقة 5: الهندسة الاجتماعية والضغط' : 'L5: Social Urgency & Pressure',
     layer6: isRTL ? 'الطبقة 6: تجاوز التحقق والالتفاف' : 'L6: Anti-Circumvention Rules',
-    layer7: isRTL ? 'الطبقة 7: قواعد بيانات التهديدات' : 'L7: Threat Intel Correlation'
+    layer7: isRTL ? 'الطبقة 7: قواعد بيانات التهديدات' : 'L7: Threat Intel Correlation',
+    layer8: isRTL ? 'الطبقة 8: ارتباط السلوك المعرفي' : 'L8: Behavior Correlation'
   };
 
   const getStatusConfig = (status: 'safe' | 'warning' | 'threat') => {
@@ -66,21 +68,27 @@ export function SevenLayerVisualizer({ sevenLayers, language, theme }: SevenLaye
     }
   };
 
+  const hasLayer8 = !!sevenLayers.layer8;
+
   return (
     <div className={`px-8 py-8 border-t ${theme === 'dark' ? 'border-white/5 bg-[#121417]/30' : 'border-slate-100 bg-slate-50/50'}`}>
       <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
         <div className="flex items-center gap-3">
           <Shield className="w-5 h-5 text-cyan-400 animate-pulse" />
           <h3 className={`text-xs font-black uppercase tracking-[0.25em] ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-            {isRTL ? 'درع فحص الطبقات السبع المتكامل' : 'SentryAI 7-Layer Forensic Scan Report'}
+            {isRTL 
+              ? (hasLayer8 ? 'درع فحص الطبقات الثماني المتكامل' : 'درع فحص الطبقات السبع المتكامل')
+              : (hasLayer8 ? 'AMANOVA 8-Layer Defense Matrix Report' : 'AMANOVA 7-Layer Forensic Scan Report')}
           </h3>
         </div>
         <span className="self-start sm:self-auto text-[10px] font-mono text-cyan-400 uppercase tracking-widest bg-cyan-400/10 border border-cyan-400/20 px-3 py-1 rounded-full">
-          {isRTL ? 'التحليل المتكامل نشط' : '7/7 Layers Audited'}
+          {isRTL 
+            ? (hasLayer8 ? 'تحليل 8 طبقات نشط' : 'تحليل 7 طبقات نشط')
+            : (hasLayer8 ? '8/8 Layers Audited' : '7/7 Layers Audited')}
         </span>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4">
+      <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 ${hasLayer8 ? 'lg:grid-cols-8' : 'lg:grid-cols-7'} gap-4`}>
         {Object.entries(sevenLayers).map(([key, value], idx) => {
           const config = getStatusConfig(value.status);
           const StatusIcon = config.icon;
