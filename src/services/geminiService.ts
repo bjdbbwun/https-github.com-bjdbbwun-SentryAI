@@ -713,7 +713,7 @@ export async function scanText(
 
   // Construct detailed prompt for AI Detection Engine
   const isImageScan = resolvedType === "Images" || resolvedType === "QR Codes" || !!imageData;
-  const prompt = `You are "AMANOVA Forensic Scanner", a state-of-the-art cyber-intelligence system operating an AI Detection Engine and an 8-Layer Defense Matrix.
+  const prompt = `You are "Obitrex Forensic Scanner", a state-of-the-art cyber-intelligence system operating an AI Detection Engine and an 8-Layer Defense Matrix.
   
   SCAN TYPE REQUESTED: "${resolvedType}"
   ${text ? `SCAN TARGET TEXT: "${text}"` : ""}
@@ -730,7 +730,7 @@ export async function scanText(
   - Layer 6 (Anti-Circumvention Rules): Heuristics computed as [Status: ${l6Status}, Details: "${l6Details}"]
   - Layer 7 (Database Lookup): Heuristics computed as [Status: ${l7Status}, Details: "${l7Details}"]
 
-  ${hubResult.matched ? `CRITICAL SECURITY NOTICE: This scan matches verified malicious threat records inside AMANOVA's local Threat Intelligence Hub. Incorporate this threat profile:
+  ${hubResult.matched ? `CRITICAL SECURITY NOTICE: This scan matches verified malicious threat records inside Obitrex's local Threat Intelligence Hub. Incorporate this threat profile:
   - Match names: ${hubResult.records.map(r => r.name).join(', ')}
   - Severity: ${hubResult.records[0].severity}
   - Campaign: ${hubResult.records[0].campaignId || "Known campaign"}` : ""}
@@ -1208,8 +1208,27 @@ export async function scanText(
     return parsed;
   } catch (error) {
     console.error("Failed to parse 8-layer Gemini response:", error);
-    const heuristicRisk = (l1Status === 'threat' || l2Status === 'threat' || l3Status === 'threat' || hubResult.matched) ? 'High' : 'Low';
+    const hasConfirmedThreat = hubResult.matched || l1Status === 'threat' || l2Status === 'threat' || l3Status === 'threat';
     
+    if (!hasConfirmedThreat) {
+      const isUnavailableFallback: ScanResult = {
+        risk: "Unknown",
+        classification: "Unknown" as any,
+        explanation: "AI analysis is temporarily unavailable. Please try again.",
+        tags: ["UNAVAILABLE"],
+        action: "Unable to verify",
+        riskScore: null,
+        confidence: null,
+        evidence: ["AI analysis is temporarily unavailable. Please try again."],
+        recommendation: "Do not open or trust this link until the verification service is available.",
+        scannedType: resolvedType,
+        matchedThreats: hubResult.records,
+        isUnavailable: true
+      };
+      return isUnavailableFallback;
+    }
+
+    const heuristicRisk = 'High';
     const isArabic = preferredLanguage === "Arabic";
     
     // Heuristic Brand Detection Setup
@@ -1253,7 +1272,7 @@ export async function scanText(
     const finalConfStr = `${finalConfScore}%`;
 
     const finalL1Details = whoisData.status === "Verified" 
-      ? `Domain: ${evaluationDomain}\nAge: ${whoisData.registrationAge}\nRegistrar: ${whoisData.registrar}\nVerified via AMANOVA Registry Cache.`
+      ? `Domain: ${evaluationDomain}\nAge: ${whoisData.registrationAge}\nRegistrar: ${whoisData.registrar}\nVerified via Obitrex Registry Cache.`
       : `Registration Age: Unavailable\nRegistrar: Unavailable\nWHOIS: Unavailable\nReason: WHOIS lookup unavailable. Never assume domain reputation.`;
 
     const finalL2Details = `Brand Typosquatting: ${typoCheck.isTypo ? `Yes, mimicking brand: ${typoCheck.brand}` : 'No direct brand typosquatting detected'}\n` +
@@ -1486,7 +1505,7 @@ export async function scanText(
 }
 
 export async function familyGuardianAnalysis(seniorName: string, recentThreats: any[], language: string = "English"): Promise<string> {
-  const prompt = `You are "AMANOVA Family Shield", the guardian module for AMANOVA.
+  const prompt = `You are "Obitrex Family Shield", the guardian module for Obitrex.
   
   You are reporting to the "Guardian" about their family member: "${seniorName}".
   
@@ -1517,7 +1536,7 @@ export async function familyGuardianAnalysis(seniorName: string, recentThreats: 
   const aiClientInstance = getAiClient();
   if (!aiClientInstance) {
     if (language === "Arabic") {
-      return `### تقرير درع العائلة AMANOVA لـ ${seniorName}
+      return `### تقرير درع العائلة Obitrex لـ ${seniorName}
       
 - **حالة الأمان الحالية**: تم الفحص والتحليل محلياً بنجاح. لا توجد مؤشرات تهديد حرجة نشطة حالياً.
 - **تفاصيل التهديدات الأخيرة**: تم تحليل ${recentThreats.length} عناصر تواصل مؤخراً عبر الفحص الفوري.
@@ -1526,7 +1545,7 @@ export async function familyGuardianAnalysis(seniorName: string, recentThreats: 
   2. تدريب العائلة على عدم النقر فوق أي روابط غير موثوقة مرسلة عبر الرسائل القصيرة.
   3. تفعيل المصادقة الثنائية المعتمدة على الرموز في كافة الحسابات الأساسية.`;
     }
-    return `### AMANOVA Family Shield Report for ${seniorName}
+    return `### Obitrex Family Shield Report for ${seniorName}
 
 - **Current Security Status**: Checked and analyzed locally. No active critical threat indicators at this time.
 - **Recent Activity Details**: Analyzed ${recentThreats.length} communication elements recently via fast local scans.
@@ -1545,7 +1564,7 @@ export async function familyGuardianAnalysis(seniorName: string, recentThreats: 
   } catch (err) {
     console.error("Family guardian analysis failed:", err);
     if (language === "Arabic") {
-      return `### تقرير درع العائلة AMANOVA لـ ${seniorName}
+      return `### تقرير درع العائلة Obitrex لـ ${seniorName}
       
 - **حالة الأمان الحالية**: تم الفحص والتحليل محلياً بنجاح. لا توجد مؤشرات تهديد حرجة نشطة حالياً.
 - **تفاصيل التهديدات الأخيرة**: تم تحليل ${recentThreats.length} عناصر تواصل مؤخراً عبر الفحص الفوري.
@@ -1554,7 +1573,7 @@ export async function familyGuardianAnalysis(seniorName: string, recentThreats: 
   2. تدريب العائلة على عدم النقر فوق أي روابط غير موثوقة مرسلة عبر الرسائل القصيرة.
   3. تفعيل المصادقة الثنائية المعتمدة على الرموز في كافة الحسابات الأساسية.`;
     }
-    return `### AMANOVA Family Shield Report for ${seniorName}
+    return `### Obitrex Family Shield Report for ${seniorName}
 
 - **Current Security Status**: Checked and analyzed locally. No active critical threat indicators at this time.
 - **Recent Activity Details**: Analyzed ${recentThreats.length} communication elements recently via fast local scans.
@@ -1584,7 +1603,7 @@ export interface DiagnosisResult {
 }
 
 export async function diagnoseSystem(systemReport: string, language: string = "English"): Promise<DiagnosisResult> {
-  const prompt = `You are "AMANOVA System Doctor" (طبيب النظام الذكي), an expert AI forensic system-level diagnostic system.
+  const prompt = `You are "Obitrex System Doctor" (طبيب النظام الذكي), an expert AI forensic system-level diagnostic system.
   Your mission is to perform a deep medical-style diagnosis of the provided system health status report, active process parameters, or configuration script.
 
   SYSTEM REPORT TO ANALYZE:

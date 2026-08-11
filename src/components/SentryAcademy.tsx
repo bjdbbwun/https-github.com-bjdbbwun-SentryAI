@@ -72,7 +72,7 @@ const ACADEMY_SCENARIOS: Scenario[] = [
       layer4: { status: 'threat', detailsEn: 'Semantic intent: Credential harvesting and account takeover attempt.', detailsAr: 'التحليل الدلالي: محاولة سرقة بيانات الاعتماد والسيطرة على الحساب.' },
       layer5: { status: 'threat', detailsEn: 'Urgency detected: 24-hour deadline causes emotional panic.', detailsAr: 'تم رصد حالة استعجال: مهلة 24 ساعة تسبب هلعاً عاطفياً لتسريع استجابتك.' },
       layer6: { status: 'safe', detailsEn: 'No MFA automated pattern bypass triggered.', detailsAr: 'لم يتم تفعيل نمط تجاوز التحقق التلقائي للرموز.' },
-      layer7: { status: 'threat', detailsEn: 'Matches high-risk typosquatting patterns in AMANOVA threat databases.', detailsAr: 'يطابق أنماط انتحال الهوية عالية الخطورة في قواعد بيانات تهديدات AMANOVA.' }
+      layer7: { status: 'threat', detailsEn: 'Matches high-risk typosquatting patterns in Obitrex threat databases.', detailsAr: 'يطابق أنماط انتحال الهوية عالية الخطورة في قواعد بيانات تهديدات Obitrex.' }
     }
   },
   {
@@ -364,12 +364,12 @@ const LATEST_SCAMS_2026: LatestScam[] = [
   }
 ];
 
-interface AmanovaAcademyProps {
+interface ObitrexAcademyProps {
   language: string;
   theme: 'light' | 'dark';
 }
 
-export function AmanovaAcademy({ language, theme }: AmanovaAcademyProps) {
+export function ObitrexAcademy({ language, theme }: ObitrexAcademyProps) {
   const isRTL = language === 'Arabic';
   
   // Tab states: 'lessons' | 'quizzes' | 'latest' | 'certificate'
@@ -397,7 +397,7 @@ export function AmanovaAcademy({ language, theme }: AmanovaAcademyProps) {
 
   // Certificate Name state
   const [certificateName, setCertificateName] = useState<string>(() => {
-    return localStorage.getItem('sentry_certificate_student_name') || 'George Amanova';
+    return localStorage.getItem('sentry_certificate_student_name') || 'George Obitrex';
   });
 
   useEffect(() => {
@@ -511,7 +511,7 @@ export function AmanovaAcademy({ language, theme }: AmanovaAcademyProps) {
   const getBadgeTitle = (s: number) => {
     if (s >= 500) return isRTL ? 'حارس سيبراني معتمد' : 'Certified Security Expert';
     if (s >= 300) return isRTL ? 'مدافع عائلي متقدم' : 'Advanced Family Defender';
-    if (s >= 100) return isRTL ? 'حارس مبتدئ' : 'AMANOVA Cadet';
+    if (s >= 100) return isRTL ? 'حارس مبتدئ' : 'Obitrex Cadet';
     return isRTL ? 'مستجد أمني' : 'Security Recruit';
   };
 
@@ -538,7 +538,7 @@ export function AmanovaAcademy({ language, theme }: AmanovaAcademyProps) {
                 {isRTL ? 'أكاديمية مكافحة الاحتيال لكبار السن' : 'SENIOR SCAM ACADEMY'}
               </span>
               <h2 className={`text-2xl font-black uppercase tracking-tight ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                {isRTL ? 'مركز التدريب والدفاع الرقمي' : 'AMANOVA Academy'}
+                {isRTL ? 'مركز التدريب والدفاع الرقمي' : 'Obitrex Academy'}
               </h2>
             </div>
           </div>
@@ -571,7 +571,7 @@ export function AmanovaAcademy({ language, theme }: AmanovaAcademyProps) {
         </div>
       </div>
 
-      {/* AMANOVA Academy Sub Tabs navigation bar */}
+      {/* Obitrex Academy Sub Tabs navigation bar */}
       <div className="flex flex-wrap items-center bg-white/5 border border-white/5 p-1 rounded-2xl gap-1 max-w-md md:max-w-xl">
         {[
           { id: 'lessons', label: isRTL ? 'الدروس التعليمية 📚' : 'Lessons 📚', icon: BookOpen },
@@ -692,7 +692,7 @@ export function AmanovaAcademy({ language, theme }: AmanovaAcademyProps) {
                   <button
                     onClick={() => toggleReadAloud(isRTL 
                       ? `${currentLesson.titleAr}. ${currentLesson.conceptAr}. الأسلوب الخبيث المستخدم: ${currentLesson.trickAr}. قاعدة الحماية الذهبية: ${currentLesson.ruleAr}` 
-                      : `${currentLesson.titleEn}. ${currentLesson.conceptEn}. How it works: ${currentLesson.trickEn}. AMANOVA golden rule: ${currentLesson.ruleEn}`
+                      : `${currentLesson.titleEn}. ${currentLesson.conceptEn}. How it works: ${currentLesson.trickEn}. Obitrex golden rule: ${currentLesson.ruleEn}`
                     )}
                     className={`px-5 py-3 rounded-xl border-2 text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2.5 self-start ${
                       lessonAudioPlaying 
@@ -714,7 +714,7 @@ export function AmanovaAcademy({ language, theme }: AmanovaAcademyProps) {
                       <span className="w-1 h-2 bg-cyan-400 rounded animate-bounce" style={{ animationDelay: '0.5s' }} />
                       <span className="w-1 h-3.5 bg-cyan-400 rounded animate-bounce" style={{ animationDelay: '0.2s' }} />
                     </div>
-                    <span>{isRTL ? 'جاري القراءة الصوتية الميسّرة للدرس ببطء...' : 'AMANOVA Senior Companion speaking...' }</span>
+                    <span>{isRTL ? 'جاري القراءة الصوتية الميسّرة للدرس ببطء...' : 'Obitrex Senior Companion speaking...' }</span>
                   </div>
                 )}
 
@@ -749,7 +749,7 @@ export function AmanovaAcademy({ language, theme }: AmanovaAcademyProps) {
                   <div className="p-5 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl space-y-2 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
                     <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest block font-black flex items-center gap-1.5">
-                      <ShieldCheck className="w-4 h-4" /> {isRTL ? 'قاعدة الأمان الذهبية لكبار السن' : '3. AMANOVA GOLDEN SAFETY RULE'}
+                      <ShieldCheck className="w-4 h-4" /> {isRTL ? 'قاعدة الأمان الذهبية لكبار السن' : '3. Obitrex GOLDEN SAFETY RULE'}
                     </span>
                     <p className="text-base text-slate-200 leading-relaxed font-bold">
                       {isRTL ? currentLesson.ruleAr : currentLesson.ruleEn}
@@ -1080,8 +1080,8 @@ export function AmanovaAcademy({ language, theme }: AmanovaAcademyProps) {
               </h3>
               <p className="text-xs text-slate-400 mt-1">
                 {isRTL 
-                  ? 'هذه الأساليب يتم تحديثها تلقائياً بالاعتماد على ذكاء AMANOVA وتحليلات التهديدات السيبرانية لحماية عائلتك.'
-                  : 'Up-to-the-minute threat vector catalog tracked by AMANOVA security analytics.'}
+                  ? 'هذه الأساليب يتم تحديثها تلقائياً بالاعتماد على ذكاء Obitrex وتحليلات التهديدات السيبرانية لحماية عائلتك.'
+                  : 'Up-to-the-minute threat vector catalog tracked by Obitrex security analytics.'}
               </p>
             </div>
 
@@ -1117,7 +1117,7 @@ export function AmanovaAcademy({ language, theme }: AmanovaAcademyProps) {
                   </div>
 
                   <div className="border-t border-white/5 pt-4 mt-5 flex justify-between items-center text-[10px] font-mono text-slate-500">
-                    <span>AMANOVA Shielding: Active</span>
+                    <span>Obitrex Shielding: Active</span>
                     <span>Classified AI Profile</span>
                   </div>
                 </div>
@@ -1193,7 +1193,7 @@ export function AmanovaAcademy({ language, theme }: AmanovaAcademyProps) {
                         <ShieldCheck className="w-9 h-9 text-slate-950" />
                       </div>
                       <span className="text-xs font-mono font-black uppercase tracking-[0.25em] text-amber-500 print:text-black">
-                        AMANOVA Safe Digital Circle
+                        Obitrex Safe Digital Circle
                       </span>
                     </div>
 
@@ -1206,7 +1206,7 @@ export function AmanovaAcademy({ language, theme }: AmanovaAcademyProps) {
 
                     <p className="text-xs sm:text-sm font-bold text-slate-300 italic max-w-lg mx-auto leading-relaxed print:text-black">
                       {isRTL 
-                        ? 'تشهد إدارة AMANOVA وجناح حماية كبار السن الميسّر بأن العضو المجتهد قد اجتاز بنجاح كافة المحاكيات والدروس الأمنية.'
+                        ? 'تشهد إدارة Obitrex وجناح حماية كبار السن الميسّر بأن العضو المجتهد قد اجتاز بنجاح كافة المحاكيات والدروس الأمنية.'
                         : 'This document formally certifies that the student below has successfully completed all interactive training modules and is fully equipped to detect social engineering threats.'}
                     </p>
 
@@ -1228,8 +1228,8 @@ export function AmanovaAcademy({ language, theme }: AmanovaAcademyProps) {
                     {/* Footer stamps / sign-offs */}
                     <div className="flex flex-col sm:flex-row justify-between items-center gap-6 pt-6 border-t border-white/5 print:border-black">
                       <div className="text-center sm:text-left">
-                        <span className="text-[9px] font-mono text-slate-500 uppercase block print:text-black">AMANOVA SECURITY GROUP</span>
-                        <span className="text-xs font-bold text-cyan-400 print:text-black">AMANOVA Guard Officer</span>
+                        <span className="text-[9px] font-mono text-slate-500 uppercase block print:text-black">Obitrex SECURITY GROUP</span>
+                        <span className="text-xs font-bold text-cyan-400 print:text-black">Obitrex Guard Officer</span>
                       </div>
                       
                       {/* Gold Badge Overlay watermark */}
@@ -1278,7 +1278,7 @@ export function AmanovaAcademy({ language, theme }: AmanovaAcademyProps) {
                   <p className="text-xs text-slate-400 leading-relaxed font-semibold">
                     {isRTL 
                       ? 'لإثبات مهاراتك الأمنية والحصول على الشهادة الرسمية المعمدة، يرجى تجميع ٤٠٠ نقطة خبرة (XP) على الأقل من خلال قراءة الدروس وإجابة اختبارات التحقق والسيناريوهات.'
-                      : 'To unlock your official AMANOVA printable certificate, you must gather at least 400 XP by studying the lessons and classifying sandbox threat scenarios.'}
+                      : 'To unlock your official Obitrex printable certificate, you must gather at least 400 XP by studying the lessons and classifying sandbox threat scenarios.'}
                   </p>
                 </div>
 

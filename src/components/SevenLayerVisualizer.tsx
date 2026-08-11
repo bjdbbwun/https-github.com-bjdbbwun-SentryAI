@@ -78,7 +78,7 @@ export function SevenLayerVisualizer({ sevenLayers, language, theme }: SevenLaye
           <h3 className={`text-xs font-black uppercase tracking-[0.25em] ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
             {isRTL 
               ? (hasLayer8 ? 'درع فحص الطبقات الثماني المتكامل' : 'درع فحص الطبقات السبع المتكامل')
-              : (hasLayer8 ? 'AMANOVA 8-Layer Defense Matrix Report' : 'AMANOVA 7-Layer Forensic Scan Report')}
+              : (hasLayer8 ? 'Obitrex 8-Layer Defense Matrix Report' : 'Obitrex 7-Layer Forensic Scan Report')}
           </h3>
         </div>
         <span className="self-start sm:self-auto text-[10px] font-mono text-cyan-400 uppercase tracking-widest bg-cyan-400/10 border border-cyan-400/20 px-3 py-1 rounded-full">

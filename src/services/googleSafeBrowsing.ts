@@ -84,8 +84,21 @@ export async function checkUrlReputation(url: string): Promise<GoogleSafeBrowsin
         };
       }
 
-      const data = await response.json();
-      return data;
+      let data: any = null;
+      const rawText = await response.text();
+      if (rawText && rawText.trim()) {
+        try {
+          data = JSON.parse(rawText);
+        } catch (_) {
+          return {
+            ...defaultResult,
+            message: "No reputation data returned by Google Safe Browsing.",
+            status: "error",
+            errorDetails: "Invalid JSON response from server proxy."
+          };
+        }
+      }
+      return data || defaultResult;
     } catch (error: any) {
       clearTimeout(timeoutId);
       const isTimeout = error.name === "AbortError";
@@ -170,7 +183,20 @@ export async function checkUrlReputation(url: string): Promise<GoogleSafeBrowsin
         };
       }
 
-      const data = await response.json();
+      let data: any = null;
+      const rawText = await response.text();
+      if (rawText && rawText.trim()) {
+        try {
+          data = JSON.parse(rawText);
+        } catch (_) {
+          return {
+            ...defaultResult,
+            message: "No reputation data returned by Google Safe Browsing.",
+            status: "error",
+            errorDetails: "Invalid JSON response from Safe Browsing API."
+          };
+        }
+      }
 
       if (data && data.matches && data.matches.length > 0) {
         // Extract threat categories from matches

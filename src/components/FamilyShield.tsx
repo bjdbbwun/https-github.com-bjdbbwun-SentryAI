@@ -52,7 +52,7 @@ interface TrustedContact {
 const LOCAL_TRANSLATIONS: Record<string, Record<string, string>> = {
   English: {
     title: "Family Protection Center",
-    tagline: "AMANOVA Safe Circle & Senior Care",
+    tagline: "Obitrex Safe Circle & Senior Care",
     familyDashboard: "Family Safety Dashboard",
     guardianView: "Guardian Console",
     seniorView: "Senior Care Assistant",
@@ -61,7 +61,7 @@ const LOCAL_TRANSLATIONS: Record<string, Record<string, string>> = {
     trustedContacts: "Emergency Circle Contacts",
     addContact: "Add Trusted Contact",
     emergencySos: "Emergency Alert (SOS)",
-    voiceAssistant: "AMANOVA Safety Voice Companion",
+    voiceAssistant: "Obitrex Safety Voice Companion",
     voiceAssistantActive: "Safety Voice Assistant: Active",
     emergencyActive: "🚨 EMERGENCY SOS SIGNAL ACTIVE",
     emergencyCountdown: "Notifying your family circle in...",
@@ -69,9 +69,9 @@ const LOCAL_TRANSLATIONS: Record<string, Record<string, string>> = {
     cancelAlert: "CANCEL CALL",
     familyScore: "Family Protection Index",
     scamDetected: "ALERT: SECURE SCAN BLOCKED SCAM",
-    readAloud: "AMANOVA Voice: Read Aloud",
+    readAloud: "Obitrex Voice: Read Aloud",
     simText: "Simulate Family Scam Call Alert",
-    talkToAmanova: "🎙️ TAP TO TALK FOR ASSISTANCE",
+    talkToObitrex: "🎙️ TAP TO TALK FOR ASSISTANCE",
     guardianBack: "Back to Mode Selection",
     noContacts: "No emergency contacts listed yet.",
     activeSiren: "Siren active. Trusted contacts are dialing you.",
@@ -79,7 +79,7 @@ const LOCAL_TRANSLATIONS: Record<string, Record<string, string>> = {
   },
   Arabic: {
     title: "مركز حماية العائلة",
-    tagline: "دائرة الأمان الذكية من AMANOVA لحماية كبار السن",
+    tagline: "دائرة الأمان الذكية من Obitrex لحماية كبار السن",
     familyDashboard: "لوحة أمان العائلة",
     guardianView: "لوحة تحكم الحارس",
     seniorView: "جناح حماية ومساعدة كبار السن",
@@ -88,7 +88,7 @@ const LOCAL_TRANSLATIONS: Record<string, Record<string, string>> = {
     trustedContacts: "دائرة الطوارئ الموثوقة",
     addContact: "إضافة جهة اتصال موثوقة",
     emergencySos: "تنبيه الطوارئ SOS",
-    voiceAssistant: "مساعد الأمان الصوتي الذكي من AMANOVA",
+    voiceAssistant: "مساعد الأمان الصوتي الذكي من Obitrex",
     voiceAssistantActive: "مساعد الأمان الصوتي: نشط",
     emergencyActive: "🚨 نداء الطوارئ SOS نشط حالياً",
     emergencyCountdown: "جاري إرسال تنبيهات الطوارئ خلال...",
@@ -96,9 +96,9 @@ const LOCAL_TRANSLATIONS: Record<string, Record<string, string>> = {
     cancelAlert: "إلغاء تنبيه الطوارئ",
     familyScore: "مؤشر أمان العائلة",
     scamDetected: "تم حظر محاولة احتيال عالية الخطورة",
-    readAloud: "مساعد أمانوفا الصوتي: اقرأ بصوت عالٍ",
+    readAloud: "مساعد أوبتريكس الصوتي: اقرأ بصوت عالٍ",
     simText: "محاكاة هجوم تصيد عاجل على جهاز كبير السن",
-    talkToAmanova: "🎙️ اضغط للتحدث مع المساعد الشخصي",
+    talkToObitrex: "🎙️ اضغط للتحدث مع المساعد الشخصي",
     guardianBack: "العودة لاختيار الوضع",
     noContacts: "لا توجد جهات اتصال طوارئ مضافة حتى الآن.",
     activeSiren: "صافرة الإنذار تعمل. جهات الاتصال الموثوقة تتصل بك الآن.",
@@ -126,8 +126,8 @@ export const FamilyShield = ({ language }: FamilyShieldProps) => {
       try { return JSON.parse(saved); } catch (e) { /* ignore */ }
     }
     return [
-      { id: 'c1', name: 'Michael (Son)', relationship: 'Son', phone: '+1 (555) 341-9281', email: 'michael.guardian@amanova.com', status: 'Linked' },
-      { id: 'c2', name: 'Sarah (Daughter)', relationship: 'Daughter', phone: '+1 (555) 782-1920', email: 'sarah.guardian@amanova.com', status: 'Standby' }
+      { id: 'c1', name: 'Michael (Son)', relationship: 'Son', phone: '+1 (555) 341-9281', email: 'michael.guardian@obitrex.com', status: 'Linked' },
+      { id: 'c2', name: 'Sarah (Daughter)', relationship: 'Daughter', phone: '+1 (555) 782-1920', email: 'sarah.guardian@obitrex.com', status: 'Standby' }
     ];
   });
 
@@ -453,7 +453,7 @@ export const FamilyShield = ({ language }: FamilyShieldProps) => {
     } else if (cmd.includes('safe') || cmd.includes('status') || cmd.includes('أمان') || cmd.includes('حالة')) {
       speak(language === 'Arabic'
         ? "جميع الأنظمة آمنة بالكامل يا جدي. تم فحص جهازك قبل قليل ولم نعثر على أي تهديدات."
-        : "Your device is fully safe, George. AMANOVA is scanning in the background and no threats are present."
+        : "Your device is fully safe, George. Obitrex is scanning in the background and no threats are present."
       );
     } else if (cmd.includes('phishing') || cmd.includes('scam') || cmd.includes('احتيال')) {
       speak(language === 'Arabic'
@@ -472,8 +472,8 @@ export const FamilyShield = ({ language }: FamilyShieldProps) => {
       }
     } else {
       speak(language === 'Arabic'
-        ? "مرحباً! أنا رفيق أمان عائلتك من AMANOVA. يمكنك أن تسألني: هل أنا آمن؟ أو تقول: ساعدني للاتصال بالطوارئ."
-        : "Hello! I am your AMANOVA Family Companion. You can ask me: Am I safe?, explain phishing, or trigger emergency alerts."
+        ? "مرحباً! أنا رفيق أمان عائلتك من Obitrex. يمكنك أن تسألني: هل أنا آمن؟ أو تقول: ساعدني للاتصال بالطوارئ."
+        : "Hello! I am your Obitrex Family Companion. You can ask me: Am I safe?, explain phishing, or trigger emergency alerts."
       );
     }
   };
@@ -539,8 +539,8 @@ export const FamilyShield = ({ language }: FamilyShieldProps) => {
       console.error('Report generation failed', error);
       // fallback
       setAiReport(language === 'Arabic'
-        ? "⚠️ تقرير أمانوفا الذكي لمراقبة العائلة:\n- الجد جورج تلقى محاولتي تصيد هاتفية خلال ٢٤ ساعة الماضية.\n- تم تحديد نمط انتحال الهوية بنجاح وحظر الروابط التالفة.\n- الإجراء الموصى به: يرجى التحدث مع العضو للتأكيد على عدم الضغط على أي روابط حظر الحساب بنكي عشوائي."
-        : "⚠️ AMANOVA Family Security Report:\n- George received 2 phishing attempts via SMS within 24 hours.\n- Social engineering pattern identified and malicious domains neutralized.\n- Recommended Action: Advise the family member never to review credit cards or banking details via instant messages."
+        ? "⚠️ تقرير أوبتريكس الذكي لمراقبة العائلة:\n- الجد جورج تلقى محاولتي تصيد هاتفية خلال ٢٤ ساعة الماضية.\n- تم تحديد نمط انتحال الهوية بنجاح وحظر الروابط التالفة.\n- الإجراء الموصى به: يرجى التحدث مع العضو للتأكيد على عدم الضغط على أي روابط حظر الحساب بنكي عشوائي."
+        : "⚠️ Obitrex Family Security Report:\n- George received 2 phishing attempts via SMS within 24 hours.\n- Social engineering pattern identified and malicious domains neutralized.\n- Recommended Action: Advise the family member never to review credit cards or banking details via instant messages."
       );
     } finally {
       setIsGeneratingReport(false);
@@ -592,8 +592,8 @@ export const FamilyShield = ({ language }: FamilyShieldProps) => {
 
     // Speak alert out loud for senior accessibility
     speak(language === 'Arabic'
-      ? `تحذير عاجل من AMANOVA! تم حظر رسالة احتيال بنكية تدعي تجميد حسابك. لقد قمنا بحماية جهازك وإخطار ابنك مايكل فوراً.`
-      : `High risk scam alert! We blocked an urgent phishing text message claiming your bank account is frozen. AMANOVA has secured your phone and informed Michael.`
+      ? `تحذير عاجل من Obitrex! تم حظر رسالة احتيال بنكية تدعي تجميد حسابك. لقد قمنا بحماية جهازك وإخطار ابنك مايكل فوراً.`
+      : `High risk scam alert! We blocked an urgent phishing text message claiming your bank account is frozen. Obitrex has secured your phone and informed Michael.`
     );
   };
 
@@ -617,7 +617,7 @@ export const FamilyShield = ({ language }: FamilyShieldProps) => {
                 </div>
                 <div className="flex-1">
                   <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-red-400 font-black block">
-                    AMANOVA Proactive Alert Shield
+                    Obitrex Proactive Alert Shield
                   </span>
                   <h4 className="text-sm font-black text-white leading-tight">{simulationBanner}</h4>
                 </div>
@@ -764,7 +764,7 @@ export const FamilyShield = ({ language }: FamilyShieldProps) => {
               <Volume2 className="w-4 h-4 animate-bounce" />
             </div>
             <p className="text-xs font-medium text-slate-300">
-              <span className="font-bold text-cyan-400 uppercase tracking-widest text-[9px] block">AMANOVA Assistant Spoken Voice</span>
+              <span className="font-bold text-cyan-400 uppercase tracking-widest text-[9px] block">Obitrex Assistant Spoken Voice</span>
               {voiceText}
             </p>
           </div>
@@ -815,7 +815,7 @@ export const FamilyShield = ({ language }: FamilyShieldProps) => {
               setMode('senior');
               speak(language === 'Arabic'
                 ? "مرحباً بك في جناح حماية كبار السن. أنا رفيقك الآمن لحمايتك من رسائل الاحتيال البنكي."
-                : "Welcome George. Your phone is fully protected by AMANOVA. Feel free to use the large buttons or the voice assistant for help."
+                : "Welcome George. Your phone is fully protected by Obitrex. Feel free to use the large buttons or the voice assistant for help."
               );
             }}
             className="group relative bg-[#0D0F12] border-2 border-white/5 hover:border-emerald-500/30 rounded-[32px] p-10 text-left transition-all hover:translate-y-[-4px] shadow-2xl overflow-hidden flex flex-col justify-between"
@@ -1043,7 +1043,7 @@ export const FamilyShield = ({ language }: FamilyShieldProps) => {
                     </button>
                     <div className="flex items-center gap-2.5 text-cyan-400 mb-4 pb-2 border-b border-white/5">
                       <Sparkles className="w-5 h-5" />
-                      <span className="text-[10px] font-mono uppercase tracking-[0.2em] font-black">AMANOVA Guardian Protection Summary</span>
+                      <span className="text-[10px] font-mono uppercase tracking-[0.2em] font-black">Obitrex Guardian Protection Summary</span>
                     </div>
                     <div className="prose prose-invert max-w-none text-xs text-slate-300 whitespace-pre-wrap leading-relaxed font-medium">
                       {aiReport}
@@ -1240,7 +1240,7 @@ export const FamilyShield = ({ language }: FamilyShieldProps) => {
                 <p className={`text-slate-400 mt-2 ${seniorModeEnabled ? 'text-xl font-medium leading-relaxed' : 'text-xs'}`}>
                   {language === 'Arabic' 
                     ? 'يقوم حارس عائلتك بمراقبة رسائل الاحتيال لمنع أي هجمات مريبة. لست بحاجة لفعل أي شيء.'
-                    : 'Your family circle (Michael and Sarah) is connected. AMANOVA is silently screening incoming text messages in the background.'}
+                    : 'Your family circle (Michael and Sarah) is connected. Obitrex is silently screening incoming text messages in the background.'}
                 </p>
               </div>
             </div>
@@ -1275,7 +1275,7 @@ export const FamilyShield = ({ language }: FamilyShieldProps) => {
               )}
             </div>
 
-            {/* AMANOVA AI Spoken assistant Companion */}
+            {/* Obitrex AI Spoken assistant Companion */}
             <div className={`p-8 bg-cyan-950/20 border border-cyan-400/20 rounded-[32px] space-y-6 flex flex-col items-center text-center ${
               seniorModeEnabled ? 'p-10' : ''
             }`}>
@@ -1307,7 +1307,7 @@ export const FamilyShield = ({ language }: FamilyShieldProps) => {
 
               <div className="space-y-2 max-w-lg">
                 <h4 className={`${seniorModeEnabled ? 'text-2xl font-black text-white' : 'text-sm font-bold text-white'}`}>
-                  {tLocal.talkToAmanova}
+                  {tLocal.talkToObitrex}
                 </h4>
                 <p className={`text-slate-400 ${seniorModeEnabled ? 'text-lg leading-relaxed' : 'text-xs'}`}>
                   {language === 'Arabic' 
@@ -1351,7 +1351,7 @@ export const FamilyShield = ({ language }: FamilyShieldProps) => {
               <HelpCircle className={`text-[#888] shrink-0 ${seniorModeEnabled ? 'w-8 h-8 mt-1' : 'w-5 h-5 mt-0.5'}`} />
               <div className="space-y-1.5">
                 <h5 className={`${seniorModeEnabled ? 'text-xl font-black text-white' : 'text-xs font-bold text-white'}`}>
-                  AMANOVA Security Advice
+                  Obitrex Security Advice
                 </h5>
                 <p className={`text-slate-400 ${seniorModeEnabled ? 'text-lg leading-relaxed' : 'text-xs'}`}>
                   {tLocal.safetyTip}

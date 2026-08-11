@@ -46,9 +46,9 @@ interface ThreatSubRecord {
 // Translations for Enterprise view
 const TRANSLATIONS = {
   English: {
-    title: "AMANOVA Enterprise Gateway",
+    title: "Obitrex Enterprise Gateway",
     tagline: "Industrial-Grade Threat Intelligence, Real-time Scans, & Custom API Keys",
-    desc: "Empower your corporate defense team. Register high-entropy API tokens, monitor request windows, submit fresh indicators of compromise (IOCs), and integrate AMANOVA's neural filters directly into your firewalls and proxies.",
+    desc: "Empower your corporate defense team. Register high-entropy API tokens, monitor request windows, submit fresh indicators of compromise (IOCs), and integrate Obitrex's neural filters directly into your firewalls and proxies.",
     generateTitle: "Provision API Key",
     companyNameLabel: "Company / Security Org Name",
     companyPlaceholder: "e.g., Vanguard Threat Ops",
@@ -64,7 +64,7 @@ const TRANSLATIONS = {
     resetLabel: "Window resets in",
     seconds: "seconds",
     limitReached: "RATE LIMIT EXCEEDED",
-    playgroundTitle: "AMANOVA API Playground",
+    playgroundTitle: "Obitrex API Playground",
     checkUrlTab: "Check URL",
     checkEmailTab: "Check Email",
     checkDomainTab: "Check Domain",
@@ -89,7 +89,7 @@ const TRANSLATIONS = {
     threatSuccess: "Threat successfully ingested and published!"
   },
   Arabic: {
-    title: "بوابة AMANOVA للمؤسسات",
+    title: "بوابة Obitrex للمؤسسات",
     tagline: "استخبارات التهديدات الصناعية، فحص فوري، ومفاتيح برمجية مخصصة",
     desc: "قم بتمكين فريق الدفاع الأمني لشركتك. قم بتسجيل رموز برمجية عالية الأمان، وتتبع النوافذ الزمنية للطلبات، وأرسل مؤشرات اختراق جديدة، واثنِ المرشحات العصبية مباشرة في جدران الحماية والخوادم الوكيلة الخاصة بك.",
     generateTitle: "تهيئة مفتاح برمجي (API Key)",
@@ -249,7 +249,7 @@ export function EnterpriseAPIView({ language, theme }: EnterpriseAPIViewProps) {
       setRateLimitTotal(data.rateLimitPerMin);
       setRateLimitRemaining(data.rateLimitPerMin);
       setCompanyName("");
-      setSuccessToast(isRTL ? "تم تهيئة المفتاح بنجاح!" : "AMANOVA Security Key provisioned!");
+      setSuccessToast(isRTL ? "تم تهيئة المفتاح بنجاح!" : "Obitrex Security Key provisioned!");
       fetchStats();
 
       setTimeout(() => setSuccessToast(null), 4000);
@@ -348,7 +348,7 @@ export function EnterpriseAPIView({ language, theme }: EnterpriseAPIViewProps) {
       fetchStats();
 
     } catch (e: any) {
-      setErrorMessage(e.message || "Failed to establish a network connection to AMANOVA API Gateway.");
+      setErrorMessage(e.message || "Failed to establish a network connection to Obitrex API Gateway.");
     } finally {
       setIsLoading(false);
     }

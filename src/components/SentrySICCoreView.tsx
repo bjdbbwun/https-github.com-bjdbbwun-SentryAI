@@ -31,7 +31,7 @@ import {
 } from "../services/centralIntelligenceCore";
 import { defaultThreats } from "../services/geminiService";
 
-export function AmanovaSICCoreView({
+export function ObitrexSICCoreView({
   language = "English",
   theme = "dark",
 }: {
@@ -226,12 +226,12 @@ export function AmanovaSICCoreView({
                   SIC Enterprise System
                 </span>
                 <h3 className="text-2xl font-black text-white tracking-tight">
-                  AMANOVA Central Intelligence Core
+                  Obitrex Central Intelligence Core
                 </h3>
               </div>
             </div>
             <p className="text-xs text-white/60 max-w-2xl leading-relaxed">
-              Orchestrator brain of AMANOVA. Utilizing event-driven architectures to automate correlation across the Threat Hub, AI Analysis pipelines, scanners, risk calculators, and predictive telemetry.
+              Orchestrator brain of Obitrex. Utilizing event-driven architectures to automate correlation across the Threat Hub, AI Analysis pipelines, scanners, risk calculators, and predictive telemetry.
             </p>
           </div>
           <div className="flex items-center gap-4 bg-white/5 border border-white/5 px-4 py-3 rounded-2xl shrink-0">

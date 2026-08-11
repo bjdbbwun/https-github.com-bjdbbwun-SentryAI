@@ -75,7 +75,7 @@ const TRANSLATIONS = {
     clickedPhishLabel: "Have you ever clicked on an unexpected SMS/Email link?",
     clickedPhishYes: "Yes, I have",
     clickedPhishNo: "No, never",
-    completedAcademyLabel: "Have you completed AMANOVA Academy training lessons?",
+    completedAcademyLabel: "Have you completed Obitrex Academy training lessons?",
     completedAcademyYes: "Yes (+10 score bonus)",
     completedAcademyNo: "No, not yet",
     
@@ -133,7 +133,7 @@ const TRANSLATIONS = {
     clickedPhishLabel: "هل سبق لك النقر على رابط في بريد أو رسالة غير متوقعة؟",
     clickedPhishYes: "نعم، لقد فعلت",
     clickedPhishNo: "لا، لم أفعل أبداً",
-    completedAcademyLabel: "هل أكملت الدروس التعليمية في أكاديمية AMANOVA؟",
+    completedAcademyLabel: "هل أكملت الدروس التعليمية في أكاديمية Obitrex؟",
     completedAcademyYes: "نعم (+١٠ نقاط إضافية)",
     completedAcademyNo: "لا، ليس بعد",
     
@@ -350,7 +350,7 @@ export function PersonalSecurityScore({ language, theme }: PersonalSecurityScore
         gainedPoints: 10,
         titleEn: "Complete Anti-Phishing Neural Training",
         titleAr: "إكمال التدريب الأكاديمي لمكافحة الاحتيال",
-        descEn: "Enroll in AMANOVA Academy Lesson 2 to train reflexes against social traps.",
+        descEn: "Enroll in Obitrex Academy Lesson 2 to train reflexes against social traps.",
         descAr: "أكمل درس الأكاديمية الخاص بتعزيز مهارة كشف انتحال الصوت والهندسة الاجتماعية."
       });
     }
@@ -409,7 +409,7 @@ export function PersonalSecurityScore({ language, theme }: PersonalSecurityScore
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          prompt: `You are the chief AI Cyber Threat Advisor at AMANOVA.
+          prompt: `You are the chief AI Cyber Threat Advisor at Obitrex.
           The user has a Personal Security Score of ${aggregateScore}/100.
           
           Specific Parameters Evaluated:
@@ -530,7 +530,7 @@ export function PersonalSecurityScore({ language, theme }: PersonalSecurityScore
               {activePatches.passLengthPatch && (
                 <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-2 text-xs text-emerald-400 font-bold">
                   <CheckCircle2 className="w-4 h-4 shrink-0" />
-                  <span>AMANOVA Passphrase Shield Active (Enforced High Entropy Core)</span>
+                  <span>Obitrex Passphrase Shield Active (Enforced High Entropy Core)</span>
                 </div>
               )}
             </div>

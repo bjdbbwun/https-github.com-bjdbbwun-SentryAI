@@ -58,6 +58,67 @@ export type SafeBrowsingCheckResult = {
   errorDetails?: string;
 };
 
+const V5_THREAT_MAP: Record<number, string> = {
+  1: "MALWARE",
+  2: "SOCIAL_ENGINEERING",
+  3: "UNWANTED_SOFTWARE",
+  4: "POTENTIALLY_HARMFUL_APPLICATION"
+};
+
+function parseV5Protobuf(bytes: Uint8Array): string[] {
+  const categories: string[] = [];
+  let pos = 0;
+  while (pos < bytes.length) {
+    const tag = bytes[pos++];
+    const fieldNum = tag >> 3;
+    const wireType = tag & 0x07;
+
+    if (wireType === 0) {
+      let val = 0, shift = 0;
+      while (pos < bytes.length) {
+        const b = bytes[pos++];
+        val |= (b & 0x7f) << shift;
+        if ((b & 0x80) === 0) break;
+        shift += 7;
+      }
+      if (V5_THREAT_MAP[val]) categories.push(V5_THREAT_MAP[val]);
+    } else if (wireType === 2) {
+      let len = 0, shift = 0;
+      while (pos < bytes.length) {
+        const b = bytes[pos++];
+        len |= (b & 0x7f) << shift;
+        if ((b & 0x80) === 0) break;
+        shift += 7;
+      }
+      const subBytes = bytes.subarray(pos, pos + len);
+      pos += len;
+
+      if (fieldNum === 2) {
+        let subPos = 0;
+        while (subPos < subBytes.length) {
+          let val = 0, vShift = 0;
+          while (subPos < subBytes.length) {
+            const b = subBytes[subPos++];
+            val |= (b & 0x7f) << vShift;
+            if ((b & 0x80) === 0) break;
+            vShift += 7;
+          }
+          if (V5_THREAT_MAP[val]) categories.push(V5_THREAT_MAP[val]);
+        }
+      }
+
+      categories.push(...parseV5Protobuf(subBytes));
+    } else if (wireType === 1) {
+      pos += 8;
+    } else if (wireType === 5) {
+      pos += 4;
+    } else {
+      break;
+    }
+  }
+  return Array.from(new Set(categories));
+}
+
 export async function checkUrlWithSafeBrowsing(
   url: string
 ): Promise<SafeBrowsingCheckResult> {
@@ -66,7 +127,7 @@ export async function checkUrlWithSafeBrowsing(
     isMalicious: false,
     threatCategories: [],
     message: "No reputation data returned by Google Safe Browsing.",
-    source: "Google Safe Browsing",
+    source: "Google Safe Browsing v5",
     status: "no_data"
   };
 
@@ -75,87 +136,101 @@ export async function checkUrlWithSafeBrowsing(
   }
 
   const cleanUrl = url.trim();
+
+  // Read strictly dedicated GOOGLE_SAFE_BROWSING_API_KEY from server environment
   const apiKey = process.env.GOOGLE_SAFE_BROWSING_API_KEY;
 
   if (!apiKey || apiKey.trim() === "" || apiKey === "MY_GOOGLE_SAFE_BROWSING_API_KEY") {
+    console.error("[Obitrex Safe Browsing Error]: GOOGLE_SAFE_BROWSING_API_KEY is not configured or missing.");
     return {
       ...defaultResult,
       status: "error",
-      errorDetails: "Invalid API key: GOOGLE_SAFE_BROWSING_API_KEY is not configured or invalid."
+      errorDetails: "GOOGLE_SAFE_BROWSING_API_KEY is not configured."
     };
   }
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 6000);
+  const timeoutId = setTimeout(() => controller.abort(), 7000);
 
-  const apiEndpoint = `https://safebrowsing.googleapis.com/v4/threatMatches:find?key=${apiKey}`;
-  const payload = {
-    client: {
-      clientId: "sentryai-cyber-defense",
-      clientVersion: "1.0.0"
-    },
-    threatInfo: {
-      threatTypes: [
-        "MALWARE",
-        "SOCIAL_ENGINEERING",
-        "UNWANTED_SOFTWARE",
-        "POTENTIALLY_HARMFUL_APPLICATION"
-      ],
-      platformTypes: ["ANY_PLATFORM"],
-      threatEntryTypes: ["URL"],
-      threatEntries: [{ url: cleanUrl }]
-    }
-  };
+  // Google Safe Browsing v5 GET urls:search
+  const apiEndpoint = `https://safebrowsing.googleapis.com/v5/urls:search?key=${apiKey}&urls=${encodeURIComponent(cleanUrl)}`;
 
   try {
     const response = await fetch(apiEndpoint, {
-      method: "POST",
+      method: "GET",
       headers: {
-        "Content-Type": "application/json"
+        "Accept": "application/x-protobuf, application/json"
       },
-      body: JSON.stringify(payload),
       signal: controller.signal
     });
 
     clearTimeout(timeoutId);
 
-    if (response.status === 400 || response.status === 403) {
-      return {
-        ...defaultResult,
-        status: "error",
-        errorDetails: `Invalid API key or bad request parameters: HTTP ${response.status}`
-      };
-    }
-
-    if (response.status === 429) {
-      return {
-        ...defaultResult,
-        status: "error",
-        errorDetails: "Google Safe Browsing API rate limits exceeded."
-      };
-    }
-
     if (!response.ok) {
+      let errBody = "";
+      try {
+        errBody = await response.text();
+      } catch (_) {}
+      console.error(`[Obitrex Safe Browsing v5 API Error]: HTTP ${response.status} - ${errBody.slice(0, 200)}`);
+
       return {
         ...defaultResult,
         status: "error",
-        errorDetails: `Google Safe Browsing API returned error code: ${response.status}`
+        errorDetails: `Google Safe Browsing v5 API returned HTTP ${response.status}`
       };
     }
 
-    const data = await response.json();
+    const contentType = response.headers.get("content-type") || "";
+    let categories: string[] = [];
 
-    if (data && data.matches && data.matches.length > 0) {
-      const categories = Array.from(
-        new Set(data.matches.map((match: any) => match.threatType).filter(Boolean))
-      ) as string[];
+    if (contentType.includes("application/x-protobuf") || contentType.includes("octet-stream")) {
+      const arrayBuf = await response.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuf);
+      categories = parseV5Protobuf(bytes);
+    } else {
+      let data: any = null;
+      const rawText = await response.text();
+      if (rawText && rawText.trim()) {
+        try {
+          data = JSON.parse(rawText);
+        } catch (_) {
+          console.warn("[Obitrex Safe Browsing Response]: Non-JSON payload received, handling gracefully.");
+        }
+      }
 
+      let threatItems: any[] = [];
+      if (data) {
+        if (Array.isArray(data.threats)) {
+          threatItems = data.threats;
+        } else if (Array.isArray(data.matches)) {
+          threatItems = data.matches;
+        } else if (data.threat) {
+          threatItems = Array.isArray(data.threat) ? data.threat : [data.threat];
+        }
+      }
+
+      threatItems.forEach((item: any) => {
+        if (typeof item === "string") {
+          categories.push(item);
+        } else if (item && typeof item.threatType === "string") {
+          categories.push(item.threatType);
+        } else if (item && Array.isArray(item.threatTypes)) {
+          item.threatTypes.forEach((t: any) => categories.push(String(t)));
+        } else if (item && item.threat && typeof item.threat.threatType === "string") {
+          categories.push(item.threat.threatType);
+        }
+      });
+    }
+
+    const uniqueCategories = Array.from(new Set(categories.filter(Boolean)));
+
+    if (uniqueCategories.length > 0) {
       return {
         success: true,
         isMalicious: true,
-        threatCategories: categories,
-        message: "Verified by Google Safe Browsing",
-        source: "Google Safe Browsing",
+        threatCategories: uniqueCategories,
+        message: "Verified by Google Safe Browsing (Threat Match)",
+        source: "Google Safe Browsing v5",
         status: "malicious"
       };
     }
@@ -164,17 +239,21 @@ export async function checkUrlWithSafeBrowsing(
       success: true,
       isMalicious: false,
       threatCategories: [],
-      message: "Google Safe Browsing: No known malicious reputation.",
-      source: "Google Safe Browsing",
+      message: "Google Safe Browsing v5: No known threat match.",
+      source: "Google Safe Browsing v5",
       status: "clean"
     };
   } catch (error: any) {
     clearTimeout(timeoutId);
     const isTimeout = error.name === "AbortError";
+    const errDetails = isTimeout
+      ? "API timeout: Safe Browsing check timed out."
+      : `Network failure: ${error.message || error}`;
+    console.error("[Obitrex Safe Browsing Exception]:", errDetails);
     return {
       ...defaultResult,
       status: "error",
-      errorDetails: isTimeout ? "API timeout: Safe Browsing check timed out." : `Network failure: ${error.message || error}`
+      errorDetails: errDetails
     };
   }
 }
@@ -299,6 +378,73 @@ function getAi(): GoogleGenAI | null {
   return aiClient;
 }
 
+export function isRetryableGeminiError(error: any): boolean {
+  if (!error) return false;
+
+  const status = Number(error.status || error.statusCode || error.response?.status || error.code);
+  if (status === 429 || status === 500 || status === 502 || status === 503 || status === 504) {
+    return true;
+  }
+
+  const msg = String(error.message || error.details || error.statusText || error).toLowerCase();
+
+  if (
+    msg.includes("400") ||
+    msg.includes("401") ||
+    msg.includes("403") ||
+    msg.includes("404") ||
+    msg.includes("bad request") ||
+    msg.includes("invalid api key") ||
+    msg.includes("unauthorized") ||
+    msg.includes("forbidden")
+  ) {
+    return false;
+  }
+
+  const retryableIndicators = [
+    "429",
+    "500",
+    "502",
+    "503",
+    "504",
+    "unavailable",
+    "resource_exhausted",
+    "service_unavailable",
+    "overloaded",
+    "rate limit",
+    "too many requests",
+    "bad gateway",
+    "gateway timeout",
+    "internal server error",
+    "deadline_exceeded",
+    "econnreset",
+    "etimedout"
+  ];
+
+  return retryableIndicators.some(indicator => msg.includes(indicator));
+}
+
+export async function callGeminiWithRetry<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  initialDelayMs: number = 1000
+): Promise<T> {
+  let attempt = 0;
+  while (true) {
+    try {
+      return await fn();
+    } catch (error: any) {
+      attempt++;
+      if (attempt > maxRetries || !isRetryableGeminiError(error)) {
+        throw error;
+      }
+      const delay = initialDelayMs * Math.pow(2, attempt - 1);
+      console.warn(`[Obitrex Gemini Retry] Attempt ${attempt}/${maxRetries} failed (${error?.message || error}). Retrying in ${delay}ms...`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+}
+
 // ---------------------------------------------------------------------
 // Server Setup
 // ---------------------------------------------------------------------
@@ -360,7 +506,7 @@ async function startServer() {
     }
   });
 
-  // Real SentryAI scan pipeline: URL scan endpoint
+  // Real Obitrex scan pipeline: URL scan endpoint
   app.post("/api/v1/scans/analyze", async (req, res) => {
     // 1. Authenticate user
     const user = await authenticateUser(req, res);
@@ -417,9 +563,9 @@ async function startServer() {
           user_id: user.id,
           content_type: "url",
           content_preview: trimmedUrl.slice(0, 2000),
-          verdict: "safe",
+          verdict: "suspicious",
           threat_type: "none",
-          risk_level: "low",
+          risk_level: "medium",
           explanation: "Pending security analysis.",
           language_detected: validatedLanguage,
           risk_score: 0,
@@ -432,17 +578,17 @@ async function startServer() {
         .single();
 
       if (scanInsertError || !scanData) {
-        console.error("[SentryAI Scan Insert Error]:", scanInsertError?.message || scanInsertError);
+        console.error("[Obitrex Scan Insert Error]:", scanInsertError?.message || scanInsertError);
         return res.status(500).json({ success: false, message: "Failed to initialize scan." });
       }
 
       scanId = scanData.id;
     } catch (dbErr) {
-      console.error("[SentryAI DB Init Error]:", dbErr);
+      console.error("[Obitrex DB Init Error]:", dbErr);
       return res.status(500).json({ success: false, message: "Failed to initialize scan due to internal error." });
     }
 
-    // After creating the scan, update its processing_status to "processing"
+    // Set processing_status to "processing"
     try {
       const { error: updateError } = await supabase
         .from("scan_history")
@@ -450,7 +596,7 @@ async function startServer() {
         .eq("id", scanId);
 
       if (updateError) {
-        console.error("[SentryAI Status Update Error]:", updateError.message);
+        console.error("[Obitrex Status Update Error]:", updateError.message);
         await markScanAsFailed(scanId, "SCAN_PROCESSING_FAILED");
         return res.status(500).json({ success: false, message: "Failed to update scan status to processing." });
       }
@@ -459,203 +605,294 @@ async function startServer() {
       return res.status(500).json({ success: false, message: "Failed to process scan." });
     }
 
-    // 4. Run Safe Browsing
-    let safeBrowsingResult;
+    // 4. Run Google Safe Browsing independently
+    let safeBrowsingResult: SafeBrowsingCheckResult | null = null;
     try {
       safeBrowsingResult = await checkUrlWithSafeBrowsing(trimmedUrl);
-    } catch (sbErr) {
-      console.error("[SentryAI Safe Browsing Run Error]:", sbErr);
-      await markScanAsFailed(scanId, "SAFE_BROWSING_UNAVAILABLE");
-      return res.status(400).json({
+    } catch (sbErr: any) {
+      console.error("[Obitrex Safe Browsing Run Exception]:", sbErr);
+      safeBrowsingResult = {
+        success: false,
+        isMalicious: false,
+        threatCategories: [],
+        message: "Google Safe Browsing check error",
+        source: "Google Safe Browsing",
+        status: "error",
+        errorDetails: sbErr?.message || String(sbErr)
+      };
+    }
+
+    const safeBrowsingFlagged = safeBrowsingResult?.success && safeBrowsingResult?.isMalicious;
+
+    // 5. Run Gemini AI Deep Analysis with exponential backoff retries (up to 3 retries for 429/500/502/503/504)
+    let geminiResult: any = null;
+    let geminiError: any = null;
+
+    const ai = getAi();
+    if (ai) {
+      try {
+        geminiResult = await callGeminiWithRetry(async () => {
+          const response = await ai.models.generateContent({
+            model: "gemini-3.5-flash",
+            contents: `You are Obitrex Cyber Defense URL Forensic Scanner. Analyze this URL for security threats (phishing, malware, scam, brand impersonation).
+            URL: "${trimmedUrl}"
+            Language requested for response: ${validatedLanguage}
+
+            Provide JSON output matching the schema.`,
+            config: {
+              responseMimeType: "application/json",
+              responseSchema: {
+                type: Type.OBJECT,
+                properties: {
+                  verdict: { type: Type.STRING, enum: ["safe", "dangerous", "suspicious"] },
+                  threatType: { type: Type.STRING, enum: ["none", "phishing", "malware", "scam", "social_engineering"] },
+                  riskLevel: { type: Type.STRING, enum: ["low", "medium", "high", "critical"] },
+                  riskScore: { type: Type.INTEGER },
+                  confidenceScore: { type: Type.INTEGER },
+                  explanation: { type: Type.STRING },
+                  evidence: { type: Type.ARRAY, items: { type: Type.STRING } }
+                },
+                required: ["verdict", "threatType", "riskLevel", "riskScore", "confidenceScore", "explanation", "evidence"]
+              }
+            }
+          });
+          return JSON.parse(response.text.trim());
+        }, 3, 1000);
+      } catch (gErr: any) {
+        geminiError = gErr;
+        console.error("[Obitrex Gemini URL Scan Failed]:", gErr?.message || gErr);
+      }
+    } else {
+      geminiError = new Error("Gemini API Client not configured on server side.");
+    }
+
+    const geminiSucceeded = geminiResult !== null;
+    const hasReliableResult = geminiSucceeded || safeBrowsingFlagged;
+
+    // 6. Handle case where NO reliable result exists (Gemini failed AND Safe Browsing did NOT find a threat)
+    if (!hasReliableResult) {
+      const realErrorMsg = geminiError?.message || String(geminiError || "Gemini service unavailable");
+
+      try {
+        await supabase
+          .from("scan_history")
+          .update({
+            verdict: "suspicious",
+            threat_type: "none",
+            risk_level: "medium",
+            risk_score: 0,
+            confidence_score: 0,
+            explanation: "AI analysis is temporarily unavailable. Please try again.",
+            processing_status: "failed",
+            processed_at: new Date().toISOString(),
+            processing_error: realErrorMsg
+          })
+          .eq("id", scanId);
+      } catch (dbErr) {
+        console.error("[Obitrex Mark Failed Exception]:", dbErr);
+      }
+
+      return res.status(503).json({
         success: false,
         scanId,
         status: "failed",
-        message: "The security reputation service is temporarily unavailable."
+        message: "AI analysis is temporarily unavailable. Please try again.",
+        isUnavailable: true
       });
     }
 
-    if (!safeBrowsingResult || !safeBrowsingResult.success || safeBrowsingResult.status === "error") {
-      await markScanAsFailed(scanId, "SAFE_BROWSING_UNAVAILABLE");
-      return res.status(400).json({
-        success: false,
-        scanId,
-        status: "failed",
-        message: "The security reputation service is temporarily unavailable."
-      });
-    }
-
-    // 5. Record Real Evidence
+    // 7. Case A: Reliable result exists! (Gemini succeeded OR Safe Browsing flagged a threat)
+    // Record scan evidence
     try {
-      const evidenceRow = safeBrowsingResult.isMalicious
-        ? {
-            scan_id: scanId,
-            evidence_type: "safe_browsing",
-            title: "Google Safe Browsing threat detected",
-            value: "malicious",
-            source: "Google Safe Browsing",
-            verification_status: "verified",
-            confidence: 100,
-            forensic_layer: "reputation"
-          }
-        : {
-            scan_id: scanId,
-            evidence_type: "safe_browsing",
-            title: "No threats detected",
-            value: "clean",
-            source: "Google Safe Browsing",
-            verification_status: "verified",
-            confidence: 95,
-            forensic_layer: "reputation"
-          };
+      const evidenceRows: any[] = [];
 
-      const { error: evidenceError } = await supabase
-        .from("scan_evidence")
-        .insert(evidenceRow);
+      if (safeBrowsingResult && safeBrowsingResult.success) {
+        evidenceRows.push({
+          scan_id: scanId,
+          evidence_type: "safe_browsing",
+          title: safeBrowsingResult.isMalicious ? "Google Safe Browsing threat detected" : "Google Safe Browsing verified clear",
+          value: safeBrowsingResult.isMalicious ? "malicious" : "clean",
+          source: "Google Safe Browsing",
+          verification_status: "verified",
+          confidence: safeBrowsingResult.isMalicious ? 100 : 95,
+          forensic_layer: "reputation"
+        });
+      }
 
-      if (evidenceError) {
-        console.error("[SentryAI Evidence Insert Error]:", evidenceError.message);
-        await markScanAsFailed(scanId, "EVIDENCE_INSERT_FAILED");
-        return res.status(500).json({ success: false, message: "Failed to record scan evidence." });
+      if (geminiSucceeded && geminiResult.evidence && Array.isArray(geminiResult.evidence)) {
+        geminiResult.evidence.forEach((ev: string) => {
+          evidenceRows.push({
+            scan_id: scanId,
+            evidence_type: "ai_analysis",
+            title: "Gemini Forensic Indicator",
+            value: ev.slice(0, 500),
+            source: "Gemini AI Engine",
+            verification_status: "verified",
+            confidence: geminiResult.confidenceScore || 90,
+            forensic_layer: "ai_nlp"
+          });
+        });
+      }
+
+      if (evidenceRows.length > 0) {
+        await supabase.from("scan_evidence").insert(evidenceRows);
       }
     } catch (evErr) {
-      console.error("[SentryAI Evidence Exception]:", evErr);
-      await markScanAsFailed(scanId, "EVIDENCE_INSERT_FAILED");
-      return res.status(500).json({ success: false, message: "Failed to process scan evidence." });
+      console.warn("[Obitrex Evidence Insert Warning]:", evErr);
     }
 
-    // 6. Update the Initial Verdict
-    try {
-      let updateFields;
-      if (safeBrowsingResult.isMalicious) {
-        const isMalware = safeBrowsingResult.threatCategories.includes("MALWARE") ||
-                          safeBrowsingResult.threatCategories.includes("POTENTIALLY_HARMFUL_APPLICATION");
-        updateFields = {
-          verdict: "dangerous",
-          threat_type: isMalware ? "malware" : "phishing",
-          explanation: "Google Safe Browsing detected a known security threat.",
-          confidence_score: 100
-        };
+    // 8. Determine final verdict fields
+    let finalVerdict: "safe" | "dangerous" | "suspicious" = "safe";
+    let finalThreatType = "none";
+    let finalRiskLevel = "low";
+    let finalRiskScore = 0;
+    let finalConfidenceScore = 95;
+    let finalExplanation = "";
+
+    const safeBrowsingFailed = !safeBrowsingResult || safeBrowsingResult.status === "error";
+
+    if (safeBrowsingFlagged) {
+      const cats = safeBrowsingResult?.threatCategories || [];
+      const isMalware = cats.includes("MALWARE") || cats.includes("POTENTIALLY_HARMFUL_APPLICATION");
+      const isUnwanted = cats.includes("UNWANTED_SOFTWARE");
+      const isPhishing = cats.includes("SOCIAL_ENGINEERING");
+
+      finalVerdict = "dangerous";
+      if (isMalware) {
+        finalThreatType = "malware";
+      } else if (isPhishing) {
+        finalThreatType = "phishing";
+      } else if (isUnwanted) {
+        finalThreatType = "scam";
       } else {
-        updateFields = {
-          verdict: "safe",
-          threat_type: "none",
-          explanation: "Google Safe Browsing found no known malicious reputation.",
-          confidence_score: 95
-        };
+        finalThreatType = "social_engineering";
       }
 
-      const { error: verdictError } = await supabase
-        .from("scan_history")
-        .update(updateFields)
-        .eq("id", scanId);
+      finalRiskLevel = "critical";
+      finalRiskScore = 100;
+      finalConfidenceScore = 100;
+      finalExplanation = (geminiSucceeded && geminiResult?.explanation)
+        ? geminiResult.explanation
+        : `Google Safe Browsing detected a known security threat (${finalThreatType.toUpperCase()}).`;
+    } else if (geminiSucceeded) {
+      let gVerdict: "safe" | "dangerous" | "suspicious" = geminiResult.verdict || (geminiResult.riskScore > 60 ? "dangerous" : "safe");
 
-      if (verdictError) {
-        console.error("[SentryAI Verdict Update Error]:", verdictError.message);
-        await markScanAsFailed(scanId, "SCAN_PROCESSING_FAILED");
-        return res.status(500).json({ success: false, message: "Failed to update scan verdict." });
+      // Requirement: If Safe Browsing itself fails, return verification unavailable, never Safe.
+      if (safeBrowsingFailed && gVerdict === "safe") {
+        gVerdict = "suspicious";
       }
-    } catch (verr) {
-      console.error("[SentryAI Verdict Exception]:", verr);
-      await markScanAsFailed(scanId, "SCAN_PROCESSING_FAILED");
-      return res.status(500).json({ success: false, message: "Failed to process scan verdict." });
+
+      finalVerdict = gVerdict;
+      finalThreatType = geminiResult.threatType || "none";
+      finalRiskLevel = geminiResult.riskLevel || (finalVerdict === "dangerous" ? "high" : finalVerdict === "suspicious" ? "medium" : "low");
+      finalRiskScore = typeof geminiResult.riskScore === "number"
+        ? (finalVerdict === "suspicious" && geminiResult.riskScore < 40 ? 50 : geminiResult.riskScore)
+        : (finalVerdict === "dangerous" ? 85 : finalVerdict === "suspicious" ? 50 : 10);
+      finalConfidenceScore = typeof geminiResult.confidenceScore === "number" ? geminiResult.confidenceScore : 85;
+
+      if (safeBrowsingFailed && gVerdict === "suspicious") {
+        finalExplanation = geminiResult.explanation
+          ? `${geminiResult.explanation} (Note: Security reputation service was unavailable).`
+          : "Reputation verification service was unavailable. Link marked as unverified for safety.";
+      } else {
+        finalExplanation = geminiResult.explanation || "Scan completed successfully.";
+      }
     }
 
-    // 7. Call the existing database engine (rpc process_scan)
+    // 9. Run RPC process_scan (for incident/notification generation if triggered)
     try {
-      const { error: rpcError } = await supabase.rpc("process_scan", {
-        p_scan_id: scanId
-      });
-
-      if (rpcError) {
-        console.error("[SentryAI RPC Error]:", rpcError.message);
-        await markScanAsFailed(scanId, "SCAN_PROCESSING_FAILED");
-        return res.status(500).json({ success: false, message: "Database analysis processing failed." });
-      }
+      await supabase.rpc("process_scan", { p_scan_id: scanId });
     } catch (rpcExc) {
-      console.error("[SentryAI RPC Exception]:", rpcExc);
-      await markScanAsFailed(scanId, "SCAN_PROCESSING_FAILED");
-      return res.status(500).json({ success: false, message: "Database analysis failed." });
+      console.warn("[Obitrex RPC process_scan warning]:", rpcExc);
     }
 
-    // 8. Fetch the completed scan row again
-    let completedScan;
+    // 10. Update exact scan_history row in Supabase to completed
+    let completedScan: any = null;
     try {
-      const { data: scanRow, error: fetchError } = await supabase
+      const processedAt = new Date().toISOString();
+      const { data: updatedRow, error: updateVerdictError } = await supabase
         .from("scan_history")
-        .select("id, user_id, content_type, content_preview, verdict, threat_type, risk_score, risk_level, confidence_score, explanation, processing_status, processed_at, processing_error, created_at")
+        .update({
+          verdict: finalVerdict,
+          threat_type: finalThreatType,
+          risk_level: finalRiskLevel,
+          risk_score: finalRiskScore,
+          confidence_score: finalConfidenceScore,
+          explanation: finalExplanation,
+          processing_status: "completed",
+          processed_at: processedAt,
+          processing_error: null
+        })
         .eq("id", scanId)
+        .select("*")
         .single();
 
-      if (fetchError || !scanRow) {
-        console.error("[SentryAI Fetch Post-RPC Error]:", fetchError?.message || fetchError);
-        return res.status(500).json({ success: false, message: "Failed to retrieve final scan analysis." });
+      if (updateVerdictError) {
+        console.error("[Obitrex Final Update Error]:", updateVerdictError.message || updateVerdictError);
+        throw new Error(`Failed to update scan_history: ${updateVerdictError.message}`);
       }
 
-      if (scanRow.user_id !== user.id) {
-        return res.status(403).json({ success: false, message: "Unauthorized access to scan results." });
-      }
-
-      if (scanRow.processing_status === "failed") {
-        return res.status(500).json({ success: false, message: "Security analysis failed." });
-      }
-
-      completedScan = scanRow;
-    } catch (fetchExc) {
-      console.error("[SentryAI Fetch Post-RPC Exception]:", fetchExc);
-      return res.status(500).json({ success: false, message: "Error retrieving completed scan results." });
+      completedScan = updatedRow;
+    } catch (verr: any) {
+      console.error("[Obitrex Final Update Exception]:", verr?.message || verr);
+      throw verr;
     }
 
-    // 9. Read Incident and Notification
+    // 12. Read Incident and Notification
     let incidentId: string | null = null;
     let notificationId: string | null = null;
 
     try {
-      const { data: incident, error: incidentError } = await supabase
+      const { data: incident } = await supabase
         .from("incident_cases")
         .select("id")
         .eq("related_scan", scanId)
         .maybeSingle();
 
-      if (!incidentError && incident) {
+      if (incident) {
         incidentId = incident.id;
-
-        const { data: notification, error: notificationError } = await supabase
+        const { data: notification } = await supabase
           .from("notifications")
           .select("id")
           .eq("incident_id", incident.id)
           .maybeSingle();
-
-        if (!notificationError && notification) {
+        if (notification) {
           notificationId = notification.id;
         }
       }
     } catch (qiErr) {
-      console.warn("[SentryAI Incident query warning]:", qiErr);
+      console.warn("[Obitrex Incident Query Warning]:", qiErr);
     }
 
-    // TODO: Production deployment must use a restricted origin allowlist
+    // 13. API Response
+    const evidenceCategories = safeBrowsingResult?.threatCategories || [];
+    const evidenceList = [
+      `Source: ${safeBrowsingResult?.source || "Obitrex Core"}`,
+      `Reputation status: ${safeBrowsingResult?.isMalicious ? "malicious" : "clean"}`,
+      ...(geminiSucceeded && geminiResult.evidence ? geminiResult.evidence : [])
+    ];
 
-    // 10. API Response
     return res.json({
       success: true,
       scan: {
-        id: completedScan.id,
-        contentType: completedScan.content_type,
-        verdict: completedScan.verdict,
-        threatType: completedScan.threat_type,
-        riskScore: completedScan.risk_score,
-        riskLevel: completedScan.risk_level,
-        confidenceScore: completedScan.confidence_score,
-        explanation: completedScan.explanation,
-        processingStatus: completedScan.processing_status,
-        processedAt: completedScan.processed_at,
-        createdAt: completedScan.created_at
+        id: completedScan?.id || scanId,
+        contentType: completedScan?.content_type || "url",
+        verdict: finalVerdict,
+        threatType: finalThreatType,
+        riskScore: finalRiskScore,
+        riskLevel: finalRiskLevel,
+        confidenceScore: finalConfidenceScore,
+        explanation: finalExplanation,
+        processingStatus: "completed",
+        processedAt: completedScan?.processed_at || new Date().toISOString(),
+        createdAt: completedScan?.created_at || new Date().toISOString()
       },
       evidence: {
-        source: "Google Safe Browsing",
-        status: safeBrowsingResult.isMalicious ? "malicious" : "clean",
-        isMalicious: safeBrowsingResult.isMalicious,
-        threatCategories: safeBrowsingResult.threatCategories
+        source: safeBrowsingResult?.source || "Google Safe Browsing & Gemini",
+        status: safeBrowsingResult?.isMalicious ? "malicious" : "clean",
+        isMalicious: !!safeBrowsingResult?.isMalicious,
+        threatCategories: evidenceCategories,
+        details: evidenceList
       },
       incidentId,
       notificationId
@@ -1835,17 +2072,19 @@ async function startServer() {
     try {
       const ai = getAi();
       if (ai) {
-        const response = await ai.models.generateContent({
-          model: "gemini-3.5-flash",
-          contents: prompt,
-        });
+        const response = await callGeminiWithRetry(async () => {
+          return await ai.models.generateContent({
+            model: "gemini-3.5-flash",
+            contents: prompt,
+          });
+        }, 3, 500);
         res.json({ result: response.text.trim() });
       } else {
-        res.status(400).json({ error: "Service Unavailable", message: "Gemini API Client not configured on server side." });
+        res.status(503).json({ error: "Service Unavailable", message: "AI analysis is temporarily unavailable. Please try again." });
       }
     } catch (e: any) {
-      console.error("Secure Gemini Proxy failure:", e);
-      res.status(500).json({ error: "Internal Server Error", details: e.message || e });
+      console.error("Secure Gemini Proxy failure:", e?.message || e);
+      res.status(503).json({ error: "Service Unavailable", message: "AI analysis is temporarily unavailable. Please try again." });
     }
   });
 
@@ -1854,17 +2093,19 @@ async function startServer() {
     try {
       const ai = getAi();
       if (!ai) {
-        return res.status(400).json({ error: "Service Unavailable", message: "Gemini API Client not configured on server side." });
+        return res.status(503).json({ error: "Service Unavailable", message: "AI analysis is temporarily unavailable. Please try again." });
       }
-      const response = await ai.models.generateContent({
-        model: model || "gemini-3.5-flash",
-        contents,
-        config,
-      });
+      const response = await callGeminiWithRetry(async () => {
+        return await ai.models.generateContent({
+          model: model || "gemini-3.5-flash",
+          contents,
+          config,
+        });
+      }, 3, 500);
       res.json({ text: response.text });
     } catch (e: any) {
-      console.error("Proxy generateContent failure:", e);
-      res.status(500).json({ error: "Internal Server Error", details: e.message || e });
+      console.error("Proxy generateContent failure:", e?.message || e);
+      res.status(503).json({ error: "Service Unavailable", message: "AI analysis is temporarily unavailable. Please try again." });
     }
   });
 

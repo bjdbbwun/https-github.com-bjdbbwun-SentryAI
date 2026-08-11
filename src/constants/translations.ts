@@ -4,7 +4,7 @@ export const translations: Record<Exclude<AppLanguage, 'Auto'>, any> = {
   English: {
     tagline: "Simple digital protection for you and your family.",
     slogan: "Check before you trust.",
-    engine: "AMANOVA Security Suite",
+    engine: "Obitrex Security Suite",
     scanner: "Scanner",
     logFile: "Log File",
     placeholder: "Paste suspicious text, email body, or message here for deep analysis...",
@@ -84,7 +84,7 @@ export const translations: Record<Exclude<AppLanguage, 'Auto'>, any> = {
   Arabic: {
     tagline: "حماية رقمية بسيطة لك ولعائلتك.",
     slogan: "تحقق قبل أن تثق.",
-    engine: "أمانوفا لحماية العائلة",
+    engine: "أوبتريكس لحماية العائلة",
     scanner: "الماسح الضوئي",
     logFile: "سجل العمليات",
     placeholder: "أدخل النص المشبوه أو محتوى البريد الإلكتروني هنا للتحليل العميق...",

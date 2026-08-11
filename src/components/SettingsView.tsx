@@ -137,9 +137,9 @@ export const SettingsView = ({ language, setLanguage, theme, setTheme, user, pro
       </section>
 
       <div className="text-center text-[10px] text-slate-400 uppercase font-black tracking-widest leading-loose pb-12">
-        AMANOVA v1.1.0 — Security Terminal <br />
+        Obitrex v1.1.0 — Security Terminal <br />
         Encryption Mode: AES-256-GCM <br />
-        © 2026 AMANOVA Security Labs
+        © 2026 Obitrex Security Labs
       </div>
     </div>
   );

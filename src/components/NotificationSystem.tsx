@@ -155,7 +155,7 @@ export const NotificationSystem = ({ language, theme }: NotificationSystemProps)
   }, []); // Run only once on mount
 
   const showBrowserNotification = (alert: AlertWithSenior) => {
-    const title = language === 'Arabic' ? '🚨 تنبيه AMANOVA' : '🚨 AMANOVA Alert';
+    const title = language === 'Arabic' ? '🚨 تنبيه Obitrex' : '🚨 Obitrex Alert';
     const body = `${alert.senior_name} ${language === 'Arabic' ? 'تلقى رسالة خطيرة' : 'received a dangerous message'}: ${alert.message || alert.alert_type}`;
     
     const notification = new Notification(title, {

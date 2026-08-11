@@ -40,7 +40,7 @@ const PRESET_THREAT_LURES = [
     title: "Crypto Trust Wallet Double Reward",
     titleAr: "احتيال مضاعفة العملات الرقمية",
     type: "Telegram/WhatsApp",
-    text: "CONGRATULATIONS! AMANOVA Global Security has selected your crypto wallet for our exclusive double-yield prize pool! Double your crypto holdings instantly. Claim your free voucher bonus reward now by connecting your Trust Wallet at the official portal link: https://trust-wallet-bonus-claim.xyz/verify. Offer expires soon!",
+    text: "CONGRATULATIONS! Obitrex Global Security has selected your crypto wallet for our exclusive double-yield prize pool! Double your crypto holdings instantly. Claim your free voucher bonus reward now by connecting your Trust Wallet at the official portal link: https://trust-wallet-bonus-claim.xyz/verify. Offer expires soon!",
   }
 ];
 
@@ -60,14 +60,14 @@ export function AdversarialSimulationEngine({ language, theme }: AseProps) {
         "تشغيل فاحص الموزون الكشفي...",
         "تحديد استراتيجيات التلاعب النفسي...",
         "رسم تكتيكات مصفوفة MITRE ATT&CK...",
-        "استخلاص مؤشرات الاختراق ومقارنة ذاكرة AMANOVA Wolf...",
+        "استخلاص مؤشرات الاختراق ومقارنة ذاكرة Obitrex Wolf...",
         "محاكاة التمدد المستقبلي والتأثير الهيكلي للتهديد..."
       ]
     : [
         "Triggering weighted heuristic scanner...",
         "Identifying cognitive manipulation metrics...",
         "Mapping MITRE ATT&CK vector tactics...",
-        "Extracting entities & querying AMANOVA Wolf Memory...",
+        "Extracting entities & querying Obitrex Wolf Memory...",
         "Simulating future zero-day expansion models..."
       ];
 
@@ -189,7 +189,7 @@ export function AdversarialSimulationEngine({ language, theme }: AseProps) {
               <p className="text-xs font-medium text-white/40 max-w-md leading-relaxed">
                 {isArabic
                   ? "* يستعمل النظام معالجة هجينة تجمع بين الأوزان الكشفية المحلية المعيارية ونظام تحليل الإدراك المعرفي للذكاء الاصطناعي."
-                  : "* Utilizes AMANOVA hybrid cognitive analysis running local weighted heuristics coupled with server-side AI intent engines."}
+                  : "* Utilizes Obitrex hybrid cognitive analysis running local weighted heuristics coupled with server-side AI intent engines."}
               </p>
               <button
                 onClick={() => handleAnalyze()}
@@ -337,7 +337,7 @@ export function AdversarialSimulationEngine({ language, theme }: AseProps) {
                 </h4>
                 <p className="text-md font-bold text-amber-400 mt-1 flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-amber-400" />
-                  {result.analysisType === "AI" ? "Gemini Cognitive AI" : "AMANOVA Weighted Heuristics"}
+                  {result.analysisType === "AI" ? "Gemini Cognitive AI" : "Obitrex Weighted Heuristics"}
                 </p>
               </div>
             </div>
@@ -382,7 +382,7 @@ export function AdversarialSimulationEngine({ language, theme }: AseProps) {
                       <FileText className="w-5 h-5 text-cyan-400" />
                       {isArabic ? "ملخص التحليل التفسيري التنبئي (Explainable AI)" : "Explainable AI Threat Assessment"}
                     </h3>
-                    <span className="text-xs text-white/30 font-mono tracking-widest">AMANOVA COGNITIVE LABS</span>
+                    <span className="text-xs text-white/30 font-mono tracking-widest">Obitrex COGNITIVE LABS</span>
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -731,7 +731,7 @@ export function AdversarialSimulationEngine({ language, theme }: AseProps) {
                     <div className="flex justify-between items-center flex-wrap gap-4">
                       <span className="text-xs font-black uppercase tracking-widest text-cyan-400 flex items-center gap-2">
                         <Database className="w-4 h-4" />
-                        {isArabic ? "مطابقة وتصنيف ذاكرة الذئب النشطة (AMANOVA Wolf Memory)" : "AMANOVA Wolf Threat Cluster Intelligence Memory Check"}
+                        {isArabic ? "مطابقة وتصنيف ذاكرة الذئب النشطة (Obitrex Wolf Memory)" : "Obitrex Wolf Threat Cluster Intelligence Memory Check"}
                       </span>
                       <span className="text-[10px] bg-cyan-400/20 text-cyan-400 font-bold uppercase tracking-widest border border-cyan-400/30 px-3 py-1 rounded-xl">
                         {isArabic ? "متطابق" : "CORRELATED"}

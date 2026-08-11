@@ -37,7 +37,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { analyzeThreatReport, IngestedThreatAnalysis } from '../services/geminiService';
 import { LiveThreatFeed } from './LiveThreatFeed';
-import { AmanovaSICCoreView } from './SentrySICCoreView';
+import { ObitrexSICCoreView } from './SentrySICCoreView';
 import { CentralIntelligenceCore } from '../services/centralIntelligenceCore';
 
 // Interfaces for Threat Intelligence
@@ -844,7 +844,7 @@ export function ThreatIntelligenceHub({ language = "English", theme = "dark" }: 
 
     setThreats(prev => [newRecord, ...prev]);
     
-    // Publish to AMANOVA Central Intelligence Core (SIC) event bus
+    // Publish to Obitrex Central Intelligence Core (SIC) event bus
     CentralIntelligenceCore.getInstance().publish("ThreatDetected", "AI_INGESTION_PIPELINE", {
       name: newRecord.name,
       classification: newRecord.threatType,
@@ -954,7 +954,7 @@ export function ThreatIntelligenceHub({ language = "English", theme = "dark" }: 
 
     setThreats(prev => [newRecord, ...prev]);
 
-    // Publish to AMANOVA Central Intelligence Core (SIC) event bus
+    // Publish to Obitrex Central Intelligence Core (SIC) event bus
     CentralIntelligenceCore.getInstance().publish("ThreatDetected", "MANUAL_INGESTION_FORM", {
       name: newRecord.name,
       classification: newRecord.threatType,
@@ -1163,7 +1163,7 @@ export function ThreatIntelligenceHub({ language = "English", theme = "dark" }: 
       targetSectors: sectors.length > 0 ? sectors : ["Technology"],
       countries: countriesList.length > 0 ? countriesList : ["Global"],
       victimCount: newCampaignVictims || 0,
-      aiSummary: newCampaignAiSummary || "Strategic intelligence summary parsed and initialized by AMANOVA.",
+      aiSummary: newCampaignAiSummary || "Strategic intelligence summary parsed and initialized by Obitrex.",
       threatCount: 0,
       addedAt: new Date().toISOString().split('T')[0],
       relatedDomains: domainsList,
@@ -1176,7 +1176,7 @@ export function ThreatIntelligenceHub({ language = "English", theme = "dark" }: 
 
     setCampaigns(prev => [...prev, newCamp]);
 
-    // Publish to AMANOVA Central Intelligence Core (SIC) event bus
+    // Publish to Obitrex Central Intelligence Core (SIC) event bus
     CentralIntelligenceCore.getInstance().publish("CampaignExpanded", "CAMPAIGN_REGISTRY_HUB", {
       campaignId: newCamp.id,
       name: newCamp.name,
@@ -1238,7 +1238,7 @@ export function ThreatIntelligenceHub({ language = "English", theme = "dark" }: 
             </div>
             <div className="flex-1 space-y-1 min-w-0">
               <div className="flex items-center justify-between gap-4">
-                <h4 className="text-xs font-mono text-cyan-400 font-bold uppercase tracking-widest">AMANOVA Intelligence Correlation</h4>
+                <h4 className="text-xs font-mono text-cyan-400 font-bold uppercase tracking-widest">Obitrex Intelligence Correlation</h4>
                 <span className="text-[9px] font-mono text-white/40 bg-white/5 px-2 py-0.5 rounded font-black uppercase">Auto-Linked</span>
               </div>
               <p className="text-sm text-white font-bold">
@@ -2322,7 +2322,7 @@ export function ThreatIntelligenceHub({ language = "English", theme = "dark" }: 
                   >
                     <div className="flex items-center justify-between border-b border-white/5 pb-4">
                       <div>
-                        <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-widest">AMANOVA Campaign Registry</span>
+                        <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-widest">Obitrex Campaign Registry</span>
                         <h3 className="text-xl font-extrabold text-white mt-1">
                           {isRTL ? 'تأسيس حملة استخبارات جديدة' : 'Establish Coordinated Campaign'}
                         </h3>
@@ -2625,12 +2625,12 @@ export function ThreatIntelligenceHub({ language = "English", theme = "dark" }: 
                     <div className="p-6 bg-gradient-to-br from-[#0F1215] to-[#0A0B0D] border border-cyan-400/10 rounded-2xl relative shadow-lg">
                       <div className="absolute right-6 top-6 bg-cyan-400/10 border border-cyan-400/20 rounded-full px-2.5 py-1 text-[8px] font-black uppercase tracking-widest text-cyan-400 flex items-center gap-1 shadow-sm">
                         <Sparkles className="w-3 h-3 text-cyan-400 animate-spin-slow" />
-                        AMANOVA Security briefing
+                        Obitrex Security briefing
                       </div>
                       <div className="space-y-2">
                         <span className="text-[10px] font-mono uppercase tracking-widest text-cyan-400 font-bold block">Strategic Intention & Motives briefing</span>
                         <p className="text-sm text-white/90 leading-relaxed font-mono pr-24 whitespace-pre-line">
-                          {selectedCampaign.aiSummary || "AMANOVA has mapped the defensive perimeter of this campaign. It demonstrates calculated attempts to evade threat lists. Defensive lockout procedures are advised."}
+                          {selectedCampaign.aiSummary || "Obitrex has mapped the defensive perimeter of this campaign. It demonstrates calculated attempts to evade threat lists. Defensive lockout procedures are advised."}
                         </p>
                       </div>
                     </div>
@@ -2913,7 +2913,7 @@ export function ThreatIntelligenceHub({ language = "English", theme = "dark" }: 
                 {isRTL ? 'البحث السريع واستعلام السمعة لمؤشرات التهديد' : 'Normalized IOC Lookup & Reputation Gateway'}
               </h3>
               <p className={`text-xs mb-6 ${theme === 'dark' ? 'text-white/40' : 'text-slate-500'}`}>
-                Query any IP address, hash, domain, crypto wallet, or URL to see if it exists in AMANOVA's normalized cyber intelligence repository.
+                Query any IP address, hash, domain, crypto wallet, or URL to see if it exists in Obitrex's normalized cyber intelligence repository.
               </p>
 
               <form onSubmit={handleIndicatorLookup} className="flex gap-2">
@@ -3036,7 +3036,7 @@ export function ThreatIntelligenceHub({ language = "English", theme = "dark" }: 
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
           >
-            <AmanovaSICCoreView language={language} theme={theme} />
+            <ObitrexSICCoreView language={language} theme={theme} />
           </motion.div>
         )}
 

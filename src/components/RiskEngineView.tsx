@@ -132,7 +132,7 @@ export function RiskEngineView({ language, theme }: RiskEngineViewProps) {
     setCurrentLogs([]);
 
     const traceLogs = [
-      "⚡ AMANOVA risk evaluation thread triggered.",
+      "⚡ Obitrex risk evaluation thread triggered.",
       `🔍 Target Asset registered: "${input.name}"`,
       `🌐 Resolving reputation score for domain: "${input.domain}"`,
       `📧 Analyzing mailbox parameters for sender: "${input.email}"`,
@@ -195,7 +195,7 @@ export function RiskEngineView({ language, theme }: RiskEngineViewProps) {
         <div>
           <span className="text-xs font-mono text-cyan-400 font-bold uppercase tracking-widest flex items-center gap-1.5">
             <Zap className="w-4 h-4 text-cyan-400 animate-pulse" />
-            AMANOVA Core Systems
+            Obitrex Core Systems
           </span>
           <h2 className="text-2xl font-black uppercase text-white mt-1">
             {isRTL ? 'محرك المخاطر التفاعلي' : 'Cognitive Risk Engine'}
@@ -566,7 +566,7 @@ export function RiskEngineView({ language, theme }: RiskEngineViewProps) {
                 <textarea
                   value={aiText}
                   onChange={(e) => setAiText(e.target.value)}
-                  placeholder="Paste details of the threat (suspicious phrasing, behavior signatures, emails, terminal warnings) to invoke AMANOVA cognitive calculations..."
+                  placeholder="Paste details of the threat (suspicious phrasing, behavior signatures, emails, terminal warnings) to invoke Obitrex cognitive calculations..."
                   className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-3 text-xs focus:outline-none focus:border-cyan-400 text-white font-sans leading-relaxed"
                 />
               </div>
@@ -617,7 +617,7 @@ export function RiskEngineView({ language, theme }: RiskEngineViewProps) {
                     <h3 className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">
                       RISK EVALUATION THREAD IN PROGRESS
                     </h3>
-                    <p className="text-[10px] text-white/40">AMANOVA core pipeline processing algorithms</p>
+                    <p className="text-[10px] text-white/40">Obitrex core pipeline processing algorithms</p>
                   </div>
                 </div>
 
@@ -636,7 +636,7 @@ export function RiskEngineView({ language, theme }: RiskEngineViewProps) {
                   
                   {/* Blinking console cursor */}
                   <div className="flex items-center gap-1 mt-1 text-cyan-400 animate-pulse">
-                    <span>&gt; AMANOVA_RISK_DAEMON_ONLINE</span>
+                    <span>&gt; Obitrex_RISK_DAEMON_ONLINE</span>
                     <div className="w-1.5 h-3 bg-cyan-400" />
                   </div>
                 </div>
@@ -695,7 +695,7 @@ export function RiskEngineView({ language, theme }: RiskEngineViewProps) {
                       </div>
 
                       <div>
-                        <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-widest block">AMANOVA Calculation Outcome</span>
+                        <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-widest block">Obitrex Calculation Outcome</span>
                         <h3 className="text-lg font-extrabold text-white mt-0.5">Threat Asset Evaluated</h3>
                         <p className="text-[10px] font-mono text-white/35 mt-0.5">Hash Id: RISK-{Math.floor(100000 + Math.random() * 900000)}</p>
                       </div>

@@ -24,11 +24,11 @@ const AppleIcon = () => (
   </svg>
 );
 
-const AmanovaLogo = ({ className = "" }: { className?: string }) => (
+const ObitrexLogo = ({ className = "" }: { className?: string }) => (
   <div className={`flex items-center gap-4 ${className}`}>
-    <img src="/image_0.png" alt="AMANOVA Logo" className="h-12 object-contain" referrerPolicy="no-referrer" />
+    <img src="/image_0.png" alt="Obitrex Logo" className="h-12 object-contain" referrerPolicy="no-referrer" />
     <h1 className="text-[28px] font-bold tracking-[-0.5px] bg-gradient-to-r from-[#0070f3] to-[#00d4ff] bg-clip-text text-transparent select-none">
-      AMANOVA
+      Obitrex
     </h1>
   </div>
 );
@@ -202,7 +202,7 @@ export const AuthPage = ({ language, onSuccess }: AuthPageProps) => {
       <div className="hidden md:flex md:w-[40%] p-12 flex-col justify-between relative z-10">
         <div>
           <div className="flex items-center mb-16">
-             <AmanovaLogo />
+             <ObitrexLogo />
           </div>
           <div className="space-y-6">
             <h2 className="text-6xl font-black text-white leading-[1.1] tracking-tight">
@@ -234,7 +234,7 @@ export const AuthPage = ({ language, onSuccess }: AuthPageProps) => {
       {/* Right Form Area */}
       <div className="flex-1 flex items-center justify-center p-6 md:p-12 relative z-10">
         <div className="w-full max-w-[450px] flex flex-col items-center gap-8">
-          <AmanovaLogo />
+          <ObitrexLogo />
           
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}

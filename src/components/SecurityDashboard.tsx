@@ -78,14 +78,14 @@ interface FamilyMemberStatus {
 // Translations dictionary specifically for the dashboard
 const DASHBOARD_TRANSLATIONS = {
   English: {
-    title: "AMANOVA Dashboard",
+    title: "Obitrex Dashboard",
     tagline: "Simple digital protection for you and your family",
     threatsToday: "Threats Blocked Today",
     campaigns: "Monitored Campaigns",
     riskTrends: "Weekly Risk Trends",
     threatMap: "Interactive Protection Map",
     latestThreats: "Real-time Activity Log",
-    securityScore: "AMANOVA Protection Score",
+    securityScore: "Obitrex Protection Score",
     familyStatus: "Family Safety Circle",
     activeDefenses: "Protection Status",
     remediationTitle: "Recommended Optimization Actions",
@@ -97,7 +97,7 @@ const DASHBOARD_TRANSLATIONS = {
     backupDesc: "Mitigates ransomware threats.",
     academyRecommendation: "Complete Academy Lesson 2: AI Voice Cloning (+5)",
     academyDesc: "Trains reflexes against social engineering calls.",
-    activeSlogan: "AMANOVA DIGITAL PROTECTION SYSTEM ACTIVE",
+    activeSlogan: "OBITREX DIGITAL PROTECTION SYSTEM ACTIVE",
     liveThreats: "Live Activity",
     nodesActive: "Protected Devices",
     mapLabel: "Active Safety Interceptors",
@@ -119,14 +119,14 @@ const DASHBOARD_TRANSLATIONS = {
     threatDestination: "Target Device"
   },
   Arabic: {
-    title: "لوحة تحكم أمانوفا",
+    title: "لوحة تحكم أوبتريكس",
     tagline: "حماية رقمية بسيطة لك ولعائلتك",
     threatsToday: "التهديدات المحظورة اليوم",
     campaigns: "الحملات المراقبة",
     riskTrends: "اتجاهات المخاطر الأسبوعية",
     threatMap: "خريطة الحماية التفاعلية",
     latestThreats: "سجل الأنشطة الفوري",
-    securityScore: "مؤشر حماية أمانوفا",
+    securityScore: "مؤشر حماية أوبتريكس",
     familyStatus: "دائرة حماية العائلة",
     activeDefenses: "حالة الحماية",
     remediationTitle: "إجراءات التحسين الموصى بها",
@@ -138,7 +138,7 @@ const DASHBOARD_TRANSLATIONS = {
     backupDesc: "يخفف من مخاطر برمجيات الفدية الخبيثة.",
     academyRecommendation: "إكمال الدرس الثاني بالأكاديمية: تزييف الصوت (+5)",
     academyDesc: "يدرب على كشف محاولات الهندسة الاجتماعية الصوتية.",
-    activeSlogan: "نظام أمانوفا للحماية الرقمية نشط",
+    activeSlogan: "نظام أوبتريكس للحماية الرقمية نشط",
     liveThreats: "الأنشطة الفورية",
     nodesActive: "الأجهزة المحمية",
     mapLabel: "أجهزة الحماية والاعتراض النشطة",
@@ -409,7 +409,7 @@ export function SecurityDashboard({ language, theme, onNavigateToTab }: Security
   };
 
   const handlePingSafeWord = (member: FamilyMemberStatus) => {
-    setActiveToast(`${t.familySafeTip} ${isRTL ? member.nameAr : member.name} : "AMANOVA_SECURE_2026"`);
+    setActiveToast(`${t.familySafeTip} ${isRTL ? member.nameAr : member.name} : "OBITREX_SECURE_2026"`);
     setTimeout(() => {
       setActiveToast(null);
     }, 5000);
@@ -713,7 +713,7 @@ export function SecurityDashboard({ language, theme, onNavigateToTab }: Security
 
             <div className="mt-5 p-3.5 bg-cyan-400/5 border border-cyan-400/10 rounded-2xl text-[10px] text-slate-400 leading-relaxed flex items-center gap-2.5">
               <div className="w-2 h-2 rounded-full bg-cyan-400 shrink-0" />
-              <span>AMANOVA digital protection filters have analyzed and mitigated 100% of detected safety incidents in the last 24 hours. No data leaks found.</span>
+              <span>Obitrex digital protection filters have analyzed and mitigated 100% of detected safety incidents in the last 24 hours. No data leaks found.</span>
             </div>
           </div>
 
@@ -863,7 +863,7 @@ export function SecurityDashboard({ language, theme, onNavigateToTab }: Security
                 </div>
                 <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
                   <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shrink-0" />
-                  {isRTL ? 'أمان العائلة النشط' : 'AMANOVA Protect Point'}
+                  {isRTL ? 'أمان العائلة النشط' : 'Obitrex Protect Point'}
                 </div>
               </div>
               <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-widest">

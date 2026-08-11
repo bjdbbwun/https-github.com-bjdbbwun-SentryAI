@@ -8,7 +8,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { diagnoseSystem, DiagnosisResult, defaultThreats } from '../services/geminiService';
 
-interface AmanovaWolfProps {
+interface ObitrexWolfProps {
   language: string;
   theme: 'light' | 'dark';
 }
@@ -61,14 +61,14 @@ const ATTACK_EVENTS = [
   "Reverse shell socket payload request"
 ];
 
-  export function AmanovaWolfView({ language, theme }: AmanovaWolfProps) {
+  export function ObitrexWolfView({ language, theme }: ObitrexWolfProps) {
     const isRTL = language === 'Arabic';
     const [activeTab, setActiveTab] = useState<'hunt' | 'decoy' | 'sandbox' | 'doctor' | 'wolf_upgrade'>('hunt');
 
   // Multi-language dictionary
   const dict: Record<string, Record<string, string>> = {
     title: {
-      English: 'AMANOVA Wolf // Active Cyber Hunter',
+      English: 'Obitrex Wolf // Active Cyber Hunter',
       Arabic: 'محطة الذئب السيبراني // الصيد والدفاع النشط'
     },
     subtitle: {
@@ -108,7 +108,7 @@ const ATTACK_EVENTS = [
       Arabic: 'جاري مسح قواعد الويب المظلم...'
     },
     doctorTitle: {
-      English: 'AMANOVA System Doctor // Neural Clinic',
+      English: 'Obitrex System Doctor // Neural Clinic',
       Arabic: 'طبيب النظام الذكي // العيادة العصبية السيبرانية'
     },
     doctorSubtitle: {
@@ -289,7 +289,7 @@ const ATTACK_EVENTS = [
     preset2: {
       label: language === 'Arabic' ? 'نظام مشفر ومحمي بالكامل (سليم)' : 'Fully Encrypted Safe Host (Pristine)',
       text: language === 'Arabic'
-        ? `[تقرير تشخيص النظام]\nالبيئة: AMANOVA Sandbox معزول بالكامل\nالتحقق متعدد العوامل: مفعل ومقيد برموز أمان صلبة FIDO2\nبروتوكولات التشفير: TLS 1.3 معزز بـ AES-256-GCM\nالحالة: جميع مؤشرات النبض سليمة، لا توجد إضافات متصفح مجهولة، حماية الذاكرة مفعلة.\nمستكشف التهديدات: نظيف بالكامل.`
+        ? `[تقرير تشخيص النظام]\nالبيئة: Obitrex Sandbox معزول بالكامل\nالتحقق متعدد العوامل: مفعل ومقيد برموز أمان صلبة FIDO2\nبروتوكولات التشفير: TLS 1.3 معزز بـ AES-256-GCM\nالحالة: جميع مؤشرات النبض سليمة، لا توجد إضافات متصفح مجهولة، حماية الذاكرة مفعلة.\nمستكشف التهديدات: نظيف بالكامل.`
         : `[SYSTEM DIAGNOSTIC REPORT]\nPlatform: Chrome OS Isolated Sandbox\nAuthentication: MFA Enabled via hardware security keys (FIDO2)\nEncryption: End-to-end TLS 1.3 with AES-256-GCM enforced\nLocalStorage: fully cleared and zeroized on session termination\nStatus: Normal heartbeat telemetry. Vulnerability scan returned 0 triggers.`
     },
     preset3: {
@@ -993,7 +993,7 @@ const ATTACK_EVENTS = [
                       <div>
                         <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest block">SYSTEM PULSE</span>
                         <span className="text-xs font-bold text-emerald-400">
-                          {isRTL ? "النبض الأمني نشط وبصحة مستقرة" : "AMANOVA Pulse Active & Syncing"}
+                          {isRTL ? "النبض الأمني نشط وبصحة مستقرة" : "Obitrex Pulse Active & Syncing"}
                         </span>
                       </div>
                     </div>
@@ -1210,7 +1210,7 @@ const ATTACK_EVENTS = [
                           <div className={isRTL ? 'text-left' : 'text-right'}>
                             <span className="text-white/30 block uppercase">{isRTL ? "توقيع طبيب الحراسة" : "Security Surgeon MD"}</span>
                             <span className="text-white/80 font-bold italic">
-                              {isRTL ? "د. ذئب الحراسة المعتمد" : "Dr. AMANOVA Wolf, AI Security MD"}
+                              {isRTL ? "د. ذئب الحراسة المعتمد" : "Dr. Obitrex Wolf, AI Security MD"}
                             </span>
                           </div>
                         </div>
@@ -1482,7 +1482,7 @@ const ATTACK_EVENTS = [
                               <p className="text-xs text-emerald-300/80 mt-0.5">
                                 {isRTL 
                                   ? "تم حقن القواعد الجديدة في محرك الفحص السريع والذكي. جدار الحماية مهيأ لفلترة أي تطابق مستقبلي تلقائياً."
-                                  : "Indicators of compromise have been successfully injected into AMANOVA's global threat matrix. The fast heuristic pre-scanner is now dynamically hardened against this scam profile."}
+                                  : "Indicators of compromise have been successfully injected into Obitrex's global threat matrix. The fast heuristic pre-scanner is now dynamically hardened against this scam profile."}
                               </p>
                             </div>
                           </div>

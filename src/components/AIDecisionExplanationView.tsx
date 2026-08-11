@@ -132,7 +132,7 @@ export function AIDecisionExplanationView({
             )}
           </div>
           <p className="text-[10px] text-white/40 leading-relaxed font-sans pt-1">
-            Patterns mapped against AMANOVA's global tactics, techniques, and procedures (TTP) registry matrix.
+            Patterns mapped against Obitrex's global tactics, techniques, and procedures (TTP) registry matrix.
           </p>
         </div>
       </div>
