@@ -7,10 +7,8 @@ export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
     plugins: [react(), tailwindcss()],
-    define: {
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-      'process.env.GOOGLE_SAFE_BROWSING_API_KEY': JSON.stringify(env.GOOGLE_SAFE_BROWSING_API_KEY),
-    },
+    // IMPORTANT: do NOT inject server secrets into the client bundle.
+    // Only VITE_ prefixed environment variables are exposed to the client via import.meta.env.
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
@@ -18,7 +16,7 @@ export default defineConfig(({mode}) => {
     },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
-      // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
+      // Do not modify—file watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
     },
   };
